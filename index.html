@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Tổ Chức - Trackpad Optimized</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            position: relative;
+            z-index: 50;
+            flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Class ẩn sidebar */
+        #sidebar.collapsed {
+            margin-left: -350px;
+        }
+
+        /* --- MAIN AREA --- */
+        #main-area {
+            flex: 1;
+            position: relative;
+            background-color: #f1f5f9;
+            /* Grid background effect */
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container cho phần sơ đồ - Dùng Native Scroll (Auto) */
+        #chart-viewport {
+            flex: 1;
+            overflow: auto; /* Cho phép cuộn tự nhiên */
+            cursor: grab; /* Con trỏ hình bàn tay */
+            display: block; /* Block để content có thể mở rộng */
+            position: relative;
+            padding: 100px; /* Padding lớn để thoải mái cuộn */
+        }
+        
+        #chart-viewport:active {
+            cursor: grabbing; /* Con trỏ nắm tay khi kéo */
+        }
+
+        /* Khung bao toàn bộ cây */
+        .tree-container {
+            transform-origin: top center; /* Zoom từ giữa trên */
+            transition: transform 0.1s ease-out; /* Hiệu ứng zoom mượt */
+            width: max-content; 
+            margin: 0 auto; /* Căn giữa */
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 100px;
+        }
+
+        /* --- TREE CSS (MINDMAP STYLE) --- */
+        .tree ul {
+            padding-top: 30px; 
+            position: relative;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center;
+        }
+
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 30px 10px 0 10px;
+            transition: all 0.5s;
+        }
+
+        /* Các đường nối (Connectors) */
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #94a3b8; width: 50%; height: 30px;
+        }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #94a3b8; width: 0; height: 30px;
+        }
+
+        /* --- CARD STYLES --- */
+        .org-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+            min-width: 160px;
+            max-width: 220px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .org-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            z-index: 20;
+            border-color: #3b82f6;
+        }
+
+        .org-card.highlight {
+            border: 3px solid #eab308 !important;
+            box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Badge & Level Colors */
+        .badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Cấp 0: Root - Đen/Xám đậm */
+        .level-0 { border-top: 4px solid #1e293b; background: #f8fafc; }
+        .level-0 .badge { background: #e2e8f0; color: #0f172a; }
+
+        /* Cấp 1, 2: Lãnh đạo cấp cao - Xanh Dương đậm */
+        .level-1, .level-2 { border-top: 4px solid #2563eb; background: #eff6ff; }
+        .level-1 .badge, .level-2 .badge { background: #dbeafe; color: #1e40af; }
+
+        /* Cấp 3: Trưởng phòng/Ban - Xanh Lá */
+        .level-3 { border-top: 4px solid #059669; background: #ecfdf5; }
+        .level-3 .badge { background: #d1fae5; color: #065f46; }
+
+        /* Cấp 4: Tổ/Nhóm - Tím */
+        .level-4 { border-top: 4px solid #9333ea; background: #faf5ff; }
+        .level-4 .badge { background: #f3e8ff; color: #6b21a8; }
+
+        /* Cấp 5+: Nhân viên - Xám */
+        .level-5, .level-6 { border-top: 4px solid #94a3b8; background: #ffffff; }
+        .level-5 .badge, .level-6 .badge { background: #f1f5f9; color: #475569; }
+
+
+        /* Collapse Button */
+        .collapse-btn {
+            width: 20px; height: 20px; background: #fff; border: 1px solid #94a3b8; border-radius: 50%;
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;
+            font-size: 14px; color: #64748b; line-height: 1;
+        }
+        .collapse-btn:hover { background: #f1f5f9; color: #2563eb; border-color: #2563eb; }
+        .hidden-children ul { display: none !important; }
+        .hidden-children .collapse-btn::after { content: '+'; }
+        .visible-children .collapse-btn::after { content: '-'; }
+
+        /* Print styles */
+        @media print {
+            @page { size: landscape; margin: 0; }
+            body { height: auto; overflow: visible; background: white; }
+            #sidebar, #toolbar, #show-sidebar-btn { display: none !important; }
+            #main-area { background: white; overflow: visible; display: block; height: auto; }
+            #chart-viewport { padding: 0; overflow: visible; display: block; }
+            .tree-container { transform: scale(0.65) !important; transform-origin: top center; width: 100%; display: block; }
+            .org-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            .collapse-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR: Mặc định ẩn (class collapsed) -->
+    <div id="sidebar" class="collapsed">
+        <div class="p-4 bg-slate-800 text-white flex justify-between items-center shadow-md">
+            <h2 class="font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+                <i class="fas fa-project-diagram text-blue-400"></i> Quản Lý Sơ Đồ
+            </h2>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="p-3 bg-white border-b grid grid-cols-2 gap-2 shadow-sm z-10">
+            <button onclick="triggerImport()" class="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2 rounded text-xs font-bold hover:bg-slate-50 transition">
+                <i class="fas fa-upload text-blue-500"></i> Import JSON
+            </button>
+            <button onclick="exportJsonData()" class="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2 rounded text-xs font-bold hover:bg-slate-50 transition">
+                <i class="fas fa-download text-green-600"></i> Xuất JSON
+            </button>
+            <button onclick="printChart()" class="col-span-2 flex items-center justify-center gap-2 bg-slate-700 text-white py-2 rounded text-xs font-bold hover:bg-slate-800 transition">
+                <i class="fas fa-print"></i> In / PDF
+            </button>
+            <button onclick="updateChart()" class="col-span-2 flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded text-xs font-bold hover:bg-blue-700 transition shadow">
+                <i class="fas fa-sync-alt"></i> Cập Nhật Sơ Đồ
+            </button>
+            <!-- Input File Ẩn -->
+            <input type="file" id="file-input" accept=".json" class="hidden" onchange="handleFileSelect(this)">
+        </div>
+
+        <div class="flex-1 flex flex-col p-2 bg-slate-50 overflow-hidden">
+            <div class="flex justify-between items-end mb-1 px-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase">Dữ liệu JSON</label>
+                <button onclick="copyJson()" class="text-[10px] text-blue-600 hover:underline">Copy</button>
+            </div>
+            <textarea id="json-input" class="flex-1 w-full p-3 text-[11px] font-mono border border-slate-300 rounded shadow-inner outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 resize-none text-slate-700 leading-tight" spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main-area">
+        <!-- Nút hiện sidebar: Mặc định hiển thị vì sidebar đang ẩn -->
+        <button id="show-sidebar-btn" onclick="toggleSidebar()" class="absolute top-4 left-4 z-40 bg-white w-9 h-9 rounded-full shadow-lg border flex items-center justify-center text-slate-600 hover:text-blue-600 transition hover:scale-105">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Floating Toolbar -->
+        <div id="toolbar" class="absolute top-4 left-0 right-0 px-4 flex justify-between pointer-events-none z-30">
+            <!-- Search Container: Margin nhỏ (60px) vì sidebar ẩn -->
+            <div class="pointer-events-auto bg-white/95 backdrop-blur shadow-lg border rounded-full pl-4 pr-2 py-1.5 flex items-center gap-2 w-72 transition-all duration-300 ml-auto md:ml-0" style="margin-left: 60px;" id="search-container">
+                <i class="fas fa-search text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" placeholder="Tìm kiếm..." class="bg-transparent text-sm outline-none w-full text-slate-700 placeholder-slate-400" onkeyup="searchNode()">
+            </div>
+
+            <div class="pointer-events-auto flex items-center gap-1 bg-white/95 backdrop-blur p-1 rounded-lg shadow-lg border text-slate-600">
+                <button onclick="zoom(-0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-minus"></i></button>
+                <span id="zoom-level" class="text-xs font-bold font-mono w-10 text-center border-x border-slate-200">100%</span>
+                <button onclick="zoom(0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-plus"></i></button>
+                <button onclick="resetView()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition text-blue-600" title="Reset View"><i class="fas fa-compress-arrows-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Viewport (Native Scroll Area) -->
+        <div id="chart-viewport">
+            <div class="tree-container" id="tree-container">
+                <div class="tree">
+                    <ul id="tree-root"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA (Dữ liệu Sơ Đồ Tổ Chức gốc)
+        const initialData = {
+          "name": "Đại Hội đồng Cổ đông", "type": "Board", "children": [
+            { "name": "Hội đồng Quản trị", "type": "Board", "children": [
+                { "name": "Ban Tổng Giám đốc", "type": "Executive", "children": [
+                    { "name": "Ban Giám sát Vận hành", "type": "Department", "manager": "Trưởng Ban", "children": [{ "name": "Chuyên viên GS Vận hành", "type": "Staff" }] },
+                    { "name": "Phòng Kinh doanh", "type": "Department", "manager": "Trưởng phòng", "children": [
+                        { "name": "Phó phòng Kinh doanh", "type": "Manager", "children": [ { "name": "BP KD Nội địa", "type": "Team", "children": [{ "name": "NV KD Nội địa", "type": "Staff" }] }, { "name": "BP KD Quốc tế", "type": "Team", "children": [{ "name": "NV KD Quốc tế", "type": "Staff" }] } ] },
+                        { "name": "BP CSKH", "type": "Team", "children": [{ "name": "NV CSKH", "type": "Staff" }] },
+                        { "name": "BP XNK", "type": "Team", "children": [{ "name": "NV XNK", "type": "Staff" }] },
+                        { "name": "BP Marketing", "type": "Team", "children": [{ "name": "CV Marketing", "type": "Staff" }] }
+                      ]
+                    },
+                    { "name": "Phòng Tài chính - Kế toán", "type": "Department", "manager": "Trưởng phòng", "children": [
+                        { "name": "Phó phòng TC-KT", "type": "Manager", "children": [ { "name": "NV Kế toán Thuế", "type": "Staff" }, { "name": "NV KT Doanh thu", "type": "Staff" }, { "name": "NV KT Thanh toán", "type": "Staff" }, { "name": "NV Kế toán CB", "type": "Staff" } ] },
+                        { "name": "NV Thủ quỹ", "type": "Staff" }
+                      ]
+                    },
+                    { "name": "Phòng HC - NS", "type": "Department", "manager": "Trưởng phòng", "children": [
+                        { "name": "Phó phòng HC-NS", "type": "Manager", "children": [ { "name": "Tổ CNTT", "type": "Team", "children": [{ "name": "NV CNTT", "type": "Staff" }] }, { "name": "CV HC-NS", "type": "Staff" }, { "name": "CV Pháp chế", "type": "Staff" }, { "name": "Tổ Tạp vụ", "type": "Team", "children": [{ "name": "NV Tạp vụ", "type": "Staff" }] } ] }
+                      ]
+                    },
+                    { "name": "Phòng Thẩm định MH", "type": "Department", "manager": "Trưởng phòng", "children": [ { "name": "Phó phòng TĐMH (1)", "type": "Manager", "children": [{ "name": "CV TĐMH Vận hành, DV", "type": "Staff" }] }, { "name": "Phó phòng TĐMH (2)", "type": "Manager", "children": [{ "name": "CV TĐMH Dự án", "type": "Staff" }] } ] },
+                    { "name": "Phòng Vận hành", "type": "Department", "manager": "Trưởng phòng", "children": [
+                        { "name": "Tổ Cơ giới", "type": "Team", "children": [{ "name": "NV Cẩu giàn", "type": "Staff" }, { "name": "NV Xe nâng", "type": "Staff" }, { "name": "NV Cầu TH", "type": "Staff" }, { "name": "NV Máy gắp", "type": "Staff" }, { "name": "NV Phụ cầu", "type": "Staff" }] },
+                        { "name": "Tổ Điều độ", "type": "Team", "children": [{ "name": "NV Đón xe", "type": "Staff" }, { "name": "NV Điều độ", "type": "Staff" }] },
+                        { "name": "Tổ Xếp dỡ", "type": "Team", "children": [{ "name": "CN Xếp dỡ", "type": "Staff" }] },
+                        { "name": "Tổ Kỹ thuật", "type": "Team", "children": [{ "name": "NV Cơ khí", "type": "Staff" }, { "name": "NV Sửa chữa máy", "type": "Staff" }, { "name": "NV Điện nước", "type": "Staff" }] },
+                        { "name": "NV Admin", "type": "Staff" }
+                      ]
+                    },
+                    { "name": "Phòng Vận tải", "type": "Department", "manager": "Trưởng phòng", "children": [ { "name": "NV Điều phối xe", "type": "Staff" }, { "name": "NV Lái xe", "type": "Staff" }, { "name": "NV Lái xe điện", "type": "Staff" }, { "name": "NV Admin", "type": "Staff" } ] },
+                    { "name": "Phòng An ninh - An toàn", "type": "Department", "manager": "Trưởng phòng", "children": [ { "name": "CV HSSE", "type": "Staff" }, { "name": "Tổ An ninh", "type": "Team", "children": [{ "name": "NV AN Chốt", "type": "Staff" }, { "name": "NV AN Tuần tra", "type": "Staff" }] }, { "name": "NV Y tế", "type": "Staff" } ] },
+                    { "name": "Phòng Kế hoạch - Dự án", "type": "Department", "manager": "Trưởng phòng", "children": [ { "name": "Phó phòng Pháp lý", "type": "Manager", "children": [{ "name": "CV Kế hoạch", "type": "Staff" }] }, { "name": "Ban QLDA", "type": "Team", "children": [{ "name": "Kỹ sư XD", "type": "Staff" }, { "name": "Kỹ sư ME", "type": "Staff" }, { "name": "QS", "type": "Staff" }, { "name": "ATLĐ", "type": "Staff" }] }, { "name": "Dự toán, TT", "type": "Staff" }, { "name": "QL Thiết kế", "type": "Staff" }, { "name": "QL Tiến độ, CL", "type": "Staff" } ] },
+                    { "name": "Tổ hợp Dịch vụ", "type": "Unit", "manager": "Quản lý", "children": [ { "name": "Bếp", "type": "Staff" }, { "name": "Nhà hàng", "type": "Staff" }, { "name": "Buồng phòng", "type": "Staff" }, { "name": "Lễ tân", "type": "Staff" } ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        };
+
+        // 2. RENDER LOGIC
+        const treeRoot = document.getElementById('tree-root');
+        const jsonInput = document.getElementById('json-input');
+
+        function createNode(node, level = 0) {
+            const hasChildren = node.children && node.children.length > 0;
+            const li = document.createElement('li');
+            li.className = hasChildren ? 'visible-children' : '';
+            
+            // XỬ LÝ MÀU THEO CẤP (Level-based Coloring)
+            // level 0: Root (Đen)
+            // level 1-2: Lãnh đạo (Xanh dương)
+            // level 3: Trưởng phòng (Xanh lá)
+            // level 4: Tổ trưởng (Tím)
+            // level 5+: Nhân viên (Xám)
+            let themeClass = 'level-' + Math.min(level, 6);
+
+            const card = document.createElement('div');
+            card.className = `org-card ${themeClass}`;
+            let icon = '';
+            if(node.type === 'Board') icon = '<i class="fas fa-crown text-orange-500 mb-1"></i>';
+            if(node.type === 'Executive') icon = '<i class="fas fa-user-tie text-blue-500 mb-1"></i>';
+            
+            let html = `${icon}<div class="font-bold text-sm text-center leading-tight">${node.name}</div>`;
+            if (node.manager) html += `<div class="text-[10px] uppercase font-bold text-slate-400 mt-1 tracking-wider">${node.manager}</div>`;
+            if (node.type) html += `<span class="badge">${node.type}</span>`;
+            card.innerHTML = html;
+
+            if (hasChildren) {
+                const btn = document.createElement('div');
+                btn.className = 'collapse-btn';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    li.classList.toggle('hidden-children');
+                    li.classList.toggle('visible-children');
+                };
+                card.appendChild(btn);
+            }
+            li.appendChild(card);
+
+            if (hasChildren) {
+                const ul = document.createElement('ul');
+                node.children.forEach(child => {
+                    ul.appendChild(createNode(child, level + 1));
+                });
+                li.appendChild(ul);
+            }
+            return li;
+        }
+
+        function renderChart(data) {
+            treeRoot.innerHTML = '';
+            treeRoot.appendChild(createNode(data));
+        }
+
+        // 3. EDITOR & INIT
+        jsonInput.value = JSON.stringify(initialData, null, 2);
+        renderChart(initialData);
+
+        function updateChart() {
+            try { renderChart(JSON.parse(jsonInput.value)); } catch (e) { alert("JSON lỗi: " + e.message); }
+        }
+        function copyJson() { jsonInput.select(); document.execCommand('copy'); }
+        
+        // --- HÀM IMPORT / EXPORT JSON ---
+        
+        /* Hướng dẫn Import:
+           1. Chuẩn bị file .json có cấu trúc như biến 'initialData'.
+           2. Bấm nút "Import JSON" và chọn file.
+           3. Sơ đồ sẽ tự động vẽ lại.
+        */
+        function triggerImport() { document.getElementById('file-input').click(); }
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    jsonInput.value = JSON.stringify(json, null, 2);
+                    renderChart(json);
+                } catch (err) { alert("File không hợp lệ."); }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // Hàm Export JSON
+        function exportJsonData() {
+            const dataStr = jsonInput.value;
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "SoDoToChuc_TaLung.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // 4. SEARCH
+        function searchNode() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.org-card');
+            cards.forEach(card => {
+                card.classList.remove('highlight');
+                if (term.length > 1 && card.innerText.toLowerCase().includes(term)) {
+                    card.classList.add('highlight');
+                    let parent = card.parentElement;
+                    while(parent) {
+                        if(parent.tagName === 'LI' && parent.classList.contains('hidden-children')) {
+                            parent.classList.remove('hidden-children');
+                            parent.classList.add('visible-children');
+                        }
+                        parent = parent.parentElement;
+                    }
+                    card.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
+                }
+            });
+        }
+
+        // 5. ZOOM & PAN LOGIC (Native + Drag)
+        let scale = 0.8;
+        const viewport = document.getElementById('chart-viewport');
+        const container = document.getElementById('tree-container');
+        const zoomDisplay = document.getElementById('zoom-level');
+
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        function updateTransform() {
+            container.style.transform = `scale(${scale})`;
+            zoomDisplay.innerText = Math.round(scale * 100) + "%";
+        }
+
+        function zoom(delta) {
+            scale = Math.max(0.1, Math.min(3, scale + delta));
+            updateTransform();
+        }
+
+        function resetView() {
+            scale = 0.8; 
+            updateTransform();
+            if(viewport) viewport.scrollTo((viewport.scrollWidth - viewport.clientWidth) / 2, 0);
+        }
+
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.org-card') || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) return;
+            isDragging = true; viewport.style.cursor = 'grabbing';
+            startX = e.pageX - viewport.offsetLeft; startY = e.pageY - viewport.offsetTop;
+            scrollLeft = viewport.scrollLeft; scrollTop = viewport.scrollTop;
+        });
+
+        viewport.addEventListener('mouseleave', () => { isDragging = false; viewport.style.cursor = 'grab'; });
+        viewport.addEventListener('mouseup', () => { isDragging = false; viewport.style.cursor = 'grab'; });
+
+        viewport.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft; const y = e.pageY - viewport.offsetTop;
+            viewport.scrollLeft = scrollLeft - (x - startX); viewport.scrollTop = scrollTop - (y - startY);
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) { e.preventDefault(); zoom(-Math.sign(e.deltaY) * 0.1); }
+        }, { passive: false });
+
+        updateTransform();
+        setTimeout(resetView, 100); 
+
+        // 6. UI TOGGLE
+        const sidebar = document.getElementById('sidebar');
+        const showBtn = document.getElementById('show-sidebar-btn');
+        const searchBox = document.getElementById('search-container');
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                showBtn.style.display = 'flex';
+                searchBox.style.marginLeft = "60px";
+            } else {
+                showBtn.style.display = 'none';
+                searchBox.style.marginLeft = "340px";
+            }
+        }
+        function printChart() { window.print(); }
+    </script>
+</body>
+</html>

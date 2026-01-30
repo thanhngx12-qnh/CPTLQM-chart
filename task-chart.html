@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Cấu Trúc AMIS 2026 - Đa Chế Độ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            position: relative;
+            z-index: 50;
+            flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        #sidebar.collapsed {
+            margin-left: -300px;
+        }
+
+        /* --- MAIN AREA --- */
+        #main-area {
+            flex: 1;
+            position: relative;
+            background-color: #f1f5f9;
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chart-viewport {
+            flex: 1;
+            overflow: auto; /* Native scroll for Tree, managed via JS for Mindmap */
+            display: block;
+            position: relative;
+        }
+        
+        /* Cursor styles for Mindmap */
+        .cursor-grab { cursor: grab; }
+        .cursor-grabbing { cursor: grabbing; }
+
+        /* --- VIEW MODE: TREE (Danh sách) STYLES --- */
+        .tree-view-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .node-item {
+            transition: all 0.2s;
+        }
+        .node-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .children-container {
+            display: none;
+            position: relative;
+            margin-left: 1.75rem;
+            padding-left: 1rem;
+            border-left: 2px dashed #cbd5e1;
+            animation: slideDown 0.2s ease-out;
+        }
+        .children-container.active { display: block; }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chevron { transition: transform 0.2s; }
+        .chevron.active { transform: rotate(90deg); }
+
+        /* --- VIEW MODE: MINDMAP STYLES --- */
+        .mindmap-container {
+            transform-origin: top center;
+            width: max-content; 
+            margin: 0 auto;
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 100px;
+        }
+
+        .mindmap-tree ul {
+            padding-top: 40px; 
+            position: relative;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center;
+        }
+
+        .mindmap-tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 40px 10px 0 10px;
+            transition: all 0.5s;
+        }
+
+        /* Connectors */
+        .mindmap-tree li::before, .mindmap-tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #94a3b8; width: 50%; height: 40px;
+        }
+        .mindmap-tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .mindmap-tree li:only-child::after, .mindmap-tree li:only-child::before { display: none; }
+        .mindmap-tree li:only-child { padding-top: 0; }
+        .mindmap-tree li:first-child::before, .mindmap-tree li:last-child::after { border: 0 none; }
+        .mindmap-tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .mindmap-tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .mindmap-tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #94a3b8; width: 0; height: 40px;
+        }
+
+        /* Card Styles (Shared mostly, but specific to Mindmap layout) */
+        .mm-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 10;
+            min-width: 140px;
+            max-width: 200px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .mm-card:hover {
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            z-index: 20;
+            border-color: #3b82f6;
+        }
+
+        /* Color Schemes (Shared) */
+        .type-root { background: #1e293b; color: white !important; border-top: 4px solid #0f172a; }
+        .type-project_group { background: #fff7ed; border-top: 4px solid #f97316; }
+        .type-key_project { background: #fffbeb; border-top: 3px solid #f59e0b; }
+        .type-dept { background: #eff6ff; border-top: 3px solid #2563eb; }
+        .type-functional { background: #ffffff; border-top: 2px solid #64748b; }
+        .type-default { background: #f8fafc; border-top: 2px dashed #94a3b8; }
+        
+        .mm-card.highlight, .node-item.highlight {
+            border: 2px solid #eab308 !important;
+            box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.2) !important;
+        }
+
+        .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-top: 4px; text-transform: uppercase; font-weight: 600; }
+        .badge-orange { background: #ffedd5; color: #c2410c; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        
+        /* Collapse Btn Mindmap */
+        .mm-collapse-btn {
+            width: 18px; height: 18px; background: #fff; border: 1px solid #cbd5e1; border-radius: 50%;
+            position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;
+            font-size: 12px; color: #64748b; line-height: 1;
+        }
+        .hidden-children ul { display: none !important; }
+        .hidden-children .mm-collapse-btn::after { content: '+'; }
+        .visible-children .mm-collapse-btn::after { content: '-'; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="collapsed">
+        <div class="p-4 bg-slate-800 text-white flex justify-between items-center shadow-md">
+            <h2 class="font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+                <i class="fas fa-cogs text-blue-400"></i> Cấu Hình
+            </h2>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 bg-white border-b space-y-3">
+            <div class="text-xs font-bold text-slate-500 uppercase">Chế độ xem</div>
+            <div class="flex bg-slate-100 p-1 rounded-lg">
+                <button onclick="switchView('mindmap')" id="btn-mindmap" class="flex-1 py-1.5 text-xs font-bold rounded-md shadow-sm bg-white text-blue-700 transition">
+                    <i class="fas fa-sitemap mr-1"></i> Mindmap
+                </button>
+                <button onclick="switchView('tree')" id="btn-tree" class="flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition">
+                    <i class="fas fa-list-ul mr-1"></i> Danh sách
+                </button>
+            </div>
+            
+            <div class="h-px bg-slate-200 my-2"></div>
+            
+            <button onclick="exportJsonData()" class="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2 rounded text-xs font-bold hover:bg-slate-50 transition">
+                <i class="fas fa-download text-green-600"></i> Xuất File JSON
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col p-2 bg-slate-50 overflow-hidden">
+            <label class="text-[10px] font-bold text-slate-500 uppercase mb-1 px-1">Dữ liệu JSON</label>
+            <textarea id="json-input" class="flex-1 w-full p-3 text-[10px] font-mono border border-slate-300 rounded shadow-inner outline-none focus:border-blue-500 resize-none text-slate-700" spellcheck="false"></textarea>
+            <button onclick="updateDataFromInput()" class="mt-2 w-full bg-blue-600 text-white py-2 rounded text-xs font-bold hover:bg-blue-700">Cập nhật Dữ liệu</button>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main-area">
+        <button id="show-sidebar-btn" onclick="toggleSidebar()" class="absolute top-4 left-4 z-40 bg-white w-9 h-9 rounded-full shadow-lg border flex items-center justify-center text-slate-600 hover:text-blue-600 transition hover:scale-105">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Toolbar -->
+        <div id="toolbar" class="absolute top-4 left-0 right-0 px-4 flex justify-between pointer-events-none z-30">
+            <!-- View Switcher in Toolbar (Quick Access) -->
+            <div class="pointer-events-auto bg-white/95 backdrop-blur shadow-lg border rounded-full p-1 flex items-center gap-1 ml-auto md:ml-12 transition-all duration-300" id="top-view-switch" style="margin-left: 60px;">
+                <button onclick="switchView('mindmap')" id="top-btn-mindmap" class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 transition" title="Chế độ Mindmap">
+                    <i class="fas fa-sitemap text-xs"></i>
+                </button>
+                <button onclick="switchView('tree')" id="top-btn-tree" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition" title="Chế độ Danh sách">
+                    <i class="fas fa-list-ul text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="pointer-events-auto bg-white/95 backdrop-blur shadow-lg border rounded-full pl-4 pr-2 py-1.5 flex items-center gap-2 w-56 md:w-64 ml-4">
+                <i class="fas fa-search text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" placeholder="Tìm kiếm..." class="bg-transparent text-sm outline-none w-full text-slate-700" onkeyup="performSearch()">
+            </div>
+
+            <!-- Zoom Controls (Only for Mindmap) -->
+            <div id="zoom-controls" class="pointer-events-auto flex items-center gap-1 bg-white/95 backdrop-blur p-1 rounded-lg shadow-lg border text-slate-600 ml-auto">
+                <button onclick="zoom(-0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-minus"></i></button>
+                <button onclick="zoom(0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-plus"></i></button>
+                <button onclick="centerMindmap()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition text-blue-600" title="Đưa về giữa"><i class="fas fa-compress-arrows-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Viewport -->
+        <div id="chart-viewport">
+            <div id="content-mount-point">
+                <!-- Content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DỮ LIỆU JSON ---
+        const initialData = {
+          "name": "HỆ THỐNG AMIS CÔNG VIỆC 2026", 
+          "type": "root", 
+          "children": [
+            {
+                "name": "KHỐI DỰ ÁN TRỌNG ĐIỂM",
+                "type": "project_group",
+                "children": [
+                    { "name": "Dự án Vũ Thành", "type": "key_project" },
+                    { "name": "Dự án Sơn Cảng", "type": "key_project" },
+                    { "name": "Dự án Bảo Châu", "type": "key_project" },
+                    { "name": "Dự án Song Toàn", "type": "key_project" }
+                ]
+            },
+            {
+                "name": "Phòng Kế hoạch - Dự án", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Pháp lý & Kế hoạch", "type": "functional" }, { "name": "Quản lý Thi công (QLDA)", "type": "functional" }, { "name": "Kỹ thuật & Kiểm soát (QS/TK)", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng Vận hành", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Tổ Cơ giới", "type": "functional" }, { "name": "Tổ Điều độ kho cảng", "type": "functional" }, { "name": "Tổ Xếp dỡ", "type": "functional" }, { "name": "Tổ Kỹ thuật - Bảo trì", "type": "functional" }, { "name": "Hành chính Vận hành", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng Kinh doanh", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "KD Nội địa", "type": "functional" }, { "name": "KD Quốc tế", "type": "functional" }, { "name": "CSKH", "type": "functional" }, { "name": "Xuất nhập khẩu", "type": "functional" }, { "name": "Marketing", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng Vận tải", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Đội xe & Vận hành", "type": "functional" }, { "name": "Điều phối & Hành chính", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Tổ hợp Dịch vụ", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Bếp", "type": "functional" }, { "name": "Nhà hàng", "type": "functional" }, { "name": "Buồng phòng", "type": "functional" }, { "name": "Lễ tân", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng HC - NS", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Nhân sự & Pháp chế", "type": "functional" }, { "name": "Tổ CNTT", "type": "functional" }, { "name": "Tổ Tạp vụ", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng TC - KT", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Nghiệp vụ Kế toán", "type": "functional" }, { "name": "QL Doanh thu & Quỹ", "type": "functional" }, { "name": "KT CN Cao Bằng", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng An ninh", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Tổ An ninh", "type": "functional" }, { "name": "An toàn HSSE & Y tế", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Phòng Thẩm định MH", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Thẩm định MH Vận hành", "type": "functional" }, { "name": "Thẩm định MH Dự án", "type": "functional" }
+                ]
+            },
+            {
+                "name": "Ban Giám sát VH", "type": "dept",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                    { "name": "Hoạt động Giám sát", "type": "functional" }
+                ]
+            }
+          ]
+        };
+
+        // --- GLOBAL STATE ---
+        let currentView = 'mindmap'; // 'mindmap' or 'tree'
+        let currentData = initialData;
+        let scale = 0.7;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        const viewport = document.getElementById('chart-viewport');
+        const contentMount = document.getElementById('content-mount-point');
+
+        // --- INITIALIZATION ---
+        document.getElementById('json-input').value = JSON.stringify(initialData, null, 2);
+        switchView('mindmap');
+
+        // --- CORE FUNCTIONS ---
+
+        function switchView(view) {
+            currentView = view;
+            
+            // Update UI buttons
+            const btnMindmap = document.getElementById('btn-mindmap');
+            const btnTree = document.getElementById('btn-tree');
+            const topBtnMindmap = document.getElementById('top-btn-mindmap');
+            const topBtnTree = document.getElementById('top-btn-tree');
+            const zoomCtrl = document.getElementById('zoom-controls');
+
+            if (view === 'mindmap') {
+                // Style Active Mindmap
+                btnMindmap.className = "flex-1 py-1.5 text-xs font-bold rounded-md shadow-sm bg-white text-blue-700 transition";
+                btnTree.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition";
+                topBtnMindmap.className = "w-8 h-8 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 transition";
+                topBtnTree.className = "w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition";
+                
+                zoomCtrl.style.display = 'flex';
+                viewport.className = "cursor-grab";
+                
+                renderMindmap();
+                enableMindmapEvents();
+                
+                // Auto focus to center after rendering
+                setTimeout(centerMindmap, 50);
+            } else {
+                // Style Active Tree
+                btnMindmap.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition";
+                btnTree.className = "flex-1 py-1.5 text-xs font-bold rounded-md shadow-sm bg-white text-blue-700 transition";
+                topBtnMindmap.className = "w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition";
+                topBtnTree.className = "w-8 h-8 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 transition";
+                
+                zoomCtrl.style.display = 'none';
+                viewport.className = "";
+                contentMount.style.transform = 'none';
+                
+                renderTree();
+                disableMindmapEvents();
+            }
+        }
+
+        function updateDataFromInput() {
+            try {
+                const newData = JSON.parse(document.getElementById('json-input').value);
+                currentData = newData;
+                if (currentView === 'mindmap') {
+                    renderMindmap();
+                    setTimeout(centerMindmap, 50);
+                } else {
+                    renderTree();
+                }
+            } catch (e) {
+                alert("Lỗi cú pháp JSON: " + e.message);
+            }
+        }
+
+        // --- RENDERERS ---
+
+        function renderMindmap() {
+            contentMount.innerHTML = '<div class="mindmap-container"><div class="mindmap-tree"><ul id="mm-root"></ul></div></div>';
+            const rootUl = document.getElementById('mm-root');
+            rootUl.appendChild(createMindmapNode(currentData, 0));
+            updateTransform(); 
+        }
+
+        function createMindmapNode(node, level) {
+            const hasChildren = node.children && node.children.length > 0;
+            const li = document.createElement('li');
+            li.className = hasChildren ? 'visible-children' : '';
+            
+            const card = document.createElement('div');
+            card.className = `mm-card ${getTypeClass(node, level)}`;
+            
+            const content = getIconAndText(node);
+            let html = `${content.icon}<div class="font-bold text-xs text-center leading-tight card-title">${node.name}</div>`;
+            if (content.badge) html += `<span class="badge ${content.badgeClass}">${content.badge}</span>`;
+            
+            card.innerHTML = html;
+            
+            if (hasChildren) {
+                const btn = document.createElement('div');
+                btn.className = 'mm-collapse-btn';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    li.classList.toggle('hidden-children');
+                    li.classList.toggle('visible-children');
+                };
+                card.appendChild(btn);
+            }
+            li.appendChild(card);
+
+            if (hasChildren) {
+                const ul = document.createElement('ul');
+                node.children.forEach(child => ul.appendChild(createMindmapNode(child, level + 1)));
+                li.appendChild(ul);
+            }
+            return li;
+        }
+
+        function renderTree() {
+            contentMount.innerHTML = '<div class="tree-view-container" id="tv-root"></div>';
+            const rootDiv = document.getElementById('tv-root');
+            rootDiv.appendChild(createTreeNode(currentData, 0));
+        }
+
+        function createTreeNode(node, level) {
+            const hasChildren = node.children && node.children.length > 0;
+            const wrapper = document.createElement('div');
+            wrapper.className = "mb-2";
+
+            let typeStyle = getTypeStyleForTree(node, level);
+            
+            const content = getIconAndText(node);
+            
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = `node-item flex items-center justify-between p-3 rounded-lg border cursor-pointer shadow-sm ${typeStyle.bg}`;
+            
+            const leftDiv = document.createElement('div');
+            leftDiv.className = "flex items-center gap-3";
+            leftDiv.innerHTML = `
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg ${typeStyle.iconBg}">
+                    ${content.icon}
+                </div>
+                <div><h3 class="font-bold text-sm ${typeStyle.text}">${node.name}</h3></div>
+            `;
+            
+            const rightDiv = document.createElement('div');
+            rightDiv.className = "flex items-center gap-2";
+            if(content.badge) {
+                rightDiv.innerHTML += `<span class="text-[10px] bg-white/50 px-2 py-0.5 rounded border border-white/20 font-semibold uppercase ${typeStyle.text}">${content.badge}</span>`;
+            }
+            if (hasChildren) {
+                const chevronColor = level === 0 ? "text-blue-200" : "text-slate-400";
+                rightDiv.innerHTML += `<i class="fas fa-chevron-right chevron ${chevronColor} text-xs transition-transform"></i>`;
+            }
+            
+            nodeDiv.appendChild(leftDiv);
+            nodeDiv.appendChild(rightDiv);
+            
+            if (hasChildren) {
+                nodeDiv.onclick = function() {
+                    const childCont = wrapper.querySelector('.children-container');
+                    const chev = nodeDiv.querySelector('.chevron');
+                    if (childCont.classList.contains('active')) {
+                        childCont.classList.remove('active');
+                        chev.classList.remove('active');
+                    } else {
+                        childCont.classList.add('active');
+                        chev.classList.add('active');
+                    }
+                };
+            }
+
+            wrapper.appendChild(nodeDiv);
+
+            if (hasChildren) {
+                const childContainer = document.createElement('div');
+                childContainer.className = "children-container";
+                if (level < 2) childContainer.classList.add('active'); 
+                if (level < 2 && hasChildren) nodeDiv.querySelector('.chevron').classList.add('active');
+
+                node.children.forEach(child => {
+                    childContainer.appendChild(createTreeNode(child, level + 1));
+                });
+                wrapper.appendChild(childContainer);
+            }
+
+            return wrapper;
+        }
+
+        // --- UTILS ---
+
+        function getTypeClass(node, level) {
+            if (level === 0) return 'type-root';
+            return `type-${node.type || 'functional'}`;
+        }
+
+        // Updated Colors for Treeview Root
+        function getTypeStyleForTree(node, level) {
+            if (level === 0) return { 
+                bg: "bg-blue-700 border-blue-800", 
+                iconBg: "bg-blue-600 text-white",
+                text: "text-white" 
+            };
+            switch(node.type) {
+                case 'project_group': return { bg: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100 text-orange-600", text: "text-slate-800" };
+                case 'key_project': return { bg: "bg-amber-50 border-amber-200", iconBg: "bg-amber-100 text-amber-600", text: "text-slate-800" };
+                case 'dept': return { bg: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100 text-blue-600", text: "text-slate-800" };
+                case 'default': return { bg: "bg-slate-50 border-dashed border-slate-300", iconBg: "bg-white text-slate-400", text: "text-slate-600" };
+                default: return { bg: "bg-white border-slate-100", iconBg: "bg-slate-50 text-slate-500", text: "text-slate-800" };
+            }
+        }
+
+        function getIconAndText(node) {
+            let icon = '';
+            let badge = '';
+            let badgeClass = 'badge-gray';
+
+            switch(node.type) {
+                case 'root': icon = '<i class="fas fa-sitemap"></i>'; break;
+                case 'project_group': icon = '<i class="fas fa-city"></i>'; badge = 'Khối'; badgeClass='badge-orange'; break;
+                case 'key_project': icon = '<i class="fas fa-building"></i>'; badge = 'Trọng điểm'; badgeClass='badge-orange'; break;
+                case 'dept': icon = '<i class="fas fa-building"></i>'; badge = 'Phòng'; badgeClass='badge-blue'; break;
+                case 'functional': icon = '<i class="fas fa-layer-group"></i>'; break;
+                case 'default': 
+                    if(node.name.includes('chung')) icon = '<i class="fas fa-briefcase"></i>';
+                    else icon = '<i class="fas fa-file-signature"></i>';
+                    break;
+            }
+            return { icon, badge, badgeClass };
+        }
+
+        // --- SEARCH ---
+        function performSearch() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            if (currentView === 'mindmap') {
+                const cards = document.querySelectorAll('.mm-card');
+                cards.forEach(card => {
+                    card.classList.remove('highlight');
+                    if (term.length > 1 && card.innerText.toLowerCase().includes(term)) {
+                        card.classList.add('highlight');
+                        expandParents(card, 'li');
+                        card.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
+                    }
+                });
+            } else {
+                const nodes = document.querySelectorAll('.node-item');
+                nodes.forEach(node => {
+                    node.classList.remove('ring-2', 'ring-yellow-400');
+                    if (term.length > 1 && node.innerText.toLowerCase().includes(term)) {
+                        node.classList.add('ring-2', 'ring-yellow-400');
+                        expandParentsTree(node);
+                        node.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }
+                });
+            }
+        }
+        
+        function expandParents(element, parentTag) {
+            let parent = element.parentElement;
+            while(parent) {
+                if(parent.tagName === parentTag.toUpperCase() && parent.classList.contains('hidden-children')) {
+                    parent.classList.remove('hidden-children');
+                    parent.classList.add('visible-children');
+                }
+                parent = parent.parentElement;
+            }
+        }
+
+        function expandParentsTree(element) {
+            let parent = element.parentElement; 
+            while(parent) {
+                if (parent.classList.contains('children-container')) {
+                    parent.classList.add('active');
+                    const siblingNode = parent.previousElementSibling;
+                    if(siblingNode) {
+                        const icon = siblingNode.querySelector('.chevron');
+                        if(icon) icon.classList.add('active');
+                    }
+                }
+                parent = parent.parentElement;
+                if(parent.id === 'tv-root') break;
+            }
+        }
+
+        // --- MINDMAP PAN & ZOOM & CENTER ---
+        function updateTransform() { 
+            const mmContainer = document.querySelector('.mindmap-container');
+            if(mmContainer) mmContainer.style.transform = `scale(${scale})`; 
+        }
+        function zoom(delta) { scale = Math.max(0.2, Math.min(2, scale + delta)); updateTransform(); }
+        function resetZoom() { scale = 0.7; updateTransform(); }
+        
+        // **NEW: Auto Center Function**
+        function centerMindmap() {
+            if (currentView !== 'mindmap') return;
+            const content = document.querySelector('.mindmap-container');
+            if (!content) return;
+            
+            // Wait for render
+            requestAnimationFrame(() => {
+                const viewportWidth = viewport.clientWidth;
+                const contentWidth = content.scrollWidth * scale; // Approx
+                
+                // Calculate scroll position to center
+                const scrollX = (content.scrollWidth - viewportWidth) / 2;
+                viewport.scrollTo({ left: scrollX, top: 0, behavior: 'smooth' });
+                
+                // Reset scale to default nice view
+                scale = 0.7;
+                updateTransform();
+            });
+        }
+
+        function onMouseDown(e) {
+            if (currentView !== 'mindmap') return;
+            if (e.target.closest('.mm-card') || e.target.closest('button')) return;
+            isDragging = true; viewport.classList.add('cursor-grabbing');
+            startX = e.pageX - viewport.offsetLeft; startY = e.pageY - viewport.offsetTop;
+            scrollLeft = viewport.scrollLeft; scrollTop = viewport.scrollTop;
+        }
+        function onMouseUp() { isDragging = false; viewport.classList.remove('cursor-grabbing'); }
+        function onMouseMove(e) {
+            if (!isDragging || currentView !== 'mindmap') return;
+            e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft; const y = e.pageY - viewport.offsetTop;
+            viewport.scrollLeft = scrollLeft - (x - startX); 
+            viewport.scrollTop = scrollTop - (y - startY);
+        }
+
+        function enableMindmapEvents() {
+            viewport.addEventListener('mousedown', onMouseDown);
+            viewport.addEventListener('mouseup', onMouseUp);
+            viewport.addEventListener('mouseleave', onMouseUp);
+            viewport.addEventListener('mousemove', onMouseMove);
+        }
+
+        function disableMindmapEvents() {
+            viewport.removeEventListener('mousedown', onMouseDown);
+            viewport.removeEventListener('mouseup', onMouseUp);
+            viewport.removeEventListener('mouseleave', onMouseUp);
+            viewport.removeEventListener('mousemove', onMouseMove);
+        }
+
+        // --- SIDEBAR UI ---
+        const sidebar = document.getElementById('sidebar');
+        const showBtn = document.getElementById('show-sidebar-btn');
+        const searchBox = document.getElementById('search-container');
+        const viewSwitch = document.getElementById('top-view-switch');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                showBtn.style.display = 'flex';
+                if(searchBox) searchBox.style.marginLeft = "60px";
+                if(viewSwitch) viewSwitch.style.marginLeft = "60px";
+            } else {
+                showBtn.style.display = 'none';
+                if(searchBox) searchBox.style.marginLeft = "290px"; 
+                if(viewSwitch) viewSwitch.style.marginLeft = "60px"; 
+            }
+        }
+
+        function exportJsonData() {
+            const dataStr = document.getElementById('json-input').value;
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "CauTrucAMIS_2026.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>

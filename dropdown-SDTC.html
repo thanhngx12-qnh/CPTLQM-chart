@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Tổ chức Tà Lùng Quang Minh 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .node-trigger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .children-container {
+            display: none;
+            position: relative;
+        }
+        .children-container.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chevron {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chevron.active {
+            transform: rotate(90deg);
+        }
+        /* Connecting lines for hierarchy visualization */
+        .line-branch {
+            position: relative;
+        }
+        .line-branch::before {
+            content: "";
+            position: absolute;
+            left: -1rem;
+            top: 0;
+            bottom: 1rem;
+            width: 2px;
+            background-color: #cbd5e1;
+            border-radius: 99px;
+        }
+        /* Horizontal connector for child */
+        .node-wrapper {
+            position: relative;
+        }
+        .node-wrapper::before {
+            content: "";
+            position: absolute;
+            left: -1rem;
+            top: 1.75rem;
+            width: 1rem;
+            height: 2px;
+            background-color: #cbd5e1;
+        }
+        /* Fix for root/first level not needing lines */
+        .root-branch > .node-wrapper::before, 
+        .root-branch > .line-branch::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-10 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <h1 class="text-3xl md:text-4xl font-black uppercase tracking-widest relative z-10">
+                Sơ đồ Tổ chức Năm 2026
+            </h1>
+            <p class="text-lg md:text-xl mt-4 opacity-90 font-light tracking-wide relative z-10 text-blue-100">
+                CÔNG TY CỔ PHẦN TÀ LÙNG QUANG MINH
+            </p>
+            <div class="mt-6 inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium border border-white/20 relative z-10">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                Phiên bản cập nhật ngày 29/12/2025
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-6 md:p-12 bg-slate-50/50">
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-4 md:gap-8 mb-12 justify-center p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-blue-600 rounded-full ring-2 ring-blue-100"></span> Quản trị
+                </div>
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-rose-600 rounded-full ring-2 ring-rose-100"></span> Ban Giám đốc
+                </div>
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-indigo-600 rounded-full ring-2 ring-indigo-100"></span> Phòng Ban
+                </div>
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-sky-500 rounded-full ring-2 ring-sky-100"></span> Cấp Phó/Quản lý
+                </div>
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-emerald-600 rounded-full ring-2 ring-emerald-100"></span> Tổ trưởng
+                </div>
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-3 h-3 bg-slate-400 rounded-full ring-2 ring-slate-200"></span> Nhân viên
+                </div>
+            </div>
+
+            <!-- Organization Chart Container -->
+            <div id="org-chart-root" class="root-branch">
+                <!-- Data injected via JS -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-white p-8 border-t border-slate-100 text-center text-slate-400 text-sm font-medium">
+            <p>© 2026 Công ty Cổ phần Tà Lùng Quang Minh</p>
+        </div>
+    </div>
+
+    <script>
+        const orgData = {
+            name: "Đại Hội đồng Cổ đông",
+            type: "root",
+            children: [
+                {
+                    name: "Hội đồng Quản trị",
+                    type: "board",
+                    children: [
+                        {
+                            name: "Ban Tổng Giám đốc",
+                            type: "executive",
+                            children: [
+                                {
+                                    name: "Ban Giám sát Vận hành",
+                                    type: "dept",
+                                    manager: "Trưởng Ban Giám sát Vận hành",
+                                    children: [{ name: "Chuyên viên Giám sát Vận hành", type: "staff" }]
+                                },
+                                {
+                                    name: "Phòng Kinh doanh",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Kinh doanh",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Kinh doanh",
+                                            type: "sub",
+                                            children: [
+                                                { 
+                                                    name: "Bộ phận Kinh doanh Nội địa", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Kinh doanh Nội địa", type: "staff" }]
+                                                },
+                                                { 
+                                                    name: "Bộ phận Kinh doanh Quốc tế", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Kinh doanh Quốc tế", type: "staff" }]
+                                                }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Chăm sóc khách hàng", 
+                                            type: "team",
+                                            children: [{ name: "Nhân viên Chăm sóc khách hàng", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Xuất nhập khẩu", 
+                                            type: "team",
+                                            children: [{ name: "Nhân viên Xuất nhập khẩu", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Marketing", 
+                                            type: "team",
+                                            children: [{ name: "Chuyên viên Marketing", type: "staff" }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Tài chính - Kế toán",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Tài chính - Kế toán",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Tài chính - Kế toán",
+                                            type: "sub",
+                                            children: [
+                                                { name: "Nhân viên Kế toán Thuế", type: "staff" },
+                                                { name: "Nhân viên Kế toán Doanh thu", type: "staff" },
+                                                { name: "Nhân viên Kế toán Thanh toán", type: "staff" },
+                                                { name: "Nhân viên Kế toán tại Cao Bằng", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Thủ quỹ", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Hành chính - Nhân sự",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Hành chính - Nhân sự",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Hành chính - Nhân sự",
+                                            type: "sub",
+                                            children: [
+                                                { 
+                                                    name: "Tổ trưởng Tổ Công nghệ thông tin", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Công nghệ thông tin", type: "staff" }]
+                                                },
+                                                { name: "Chuyên viên Hành chính - Nhân sự", type: "staff" },
+                                                { name: "Chuyên viên Pháp chế", type: "staff" },
+                                                { 
+                                                    name: "Tổ trưởng Tổ Tạp vụ", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Tạp vụ", type: "staff" }]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Thẩm định mua hàng",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Thẩm định mua hàng",
+                                    children: [
+                                        { 
+                                            name: "Phó phòng Thẩm định mua hàng (Vận hành, Dịch vụ)", 
+                                            type: "sub", 
+                                            children: [{name: "Chuyên viên Thẩm định mua hàng vận hành, dịch vụ", type: "staff"}] 
+                                        },
+                                        { 
+                                            name: "Phó phòng Thẩm định mua hàng (Dự án)", 
+                                            type: "sub", 
+                                            children: [{name: "Chuyên viên Thẩm định mua hàng dự án", type: "staff"}] 
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Vận hành",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Vận hành",
+                                    children: [
+                                        { 
+                                            name: "Tổ trưởng Tổ Cơ giới", 
+                                            type: "team",
+                                            children: [
+                                                { 
+                                                    name: "Nhân viên Vận hành Cẩu giàn", 
+                                                    type: "sub", // Cấp trung gian để chứa con
+                                                    children: [{ name: "Nhân viên Phụ cầu", type: "staff" }]
+                                                },
+                                                { 
+                                                    name: "Nhân viên Vận hành Cầu tổng hợp", 
+                                                    type: "sub", // Cấp trung gian để chứa con
+                                                    children: [{ name: "Nhân viên Phụ cầu", type: "staff" }]
+                                                },
+                                                { name: "Nhân viên Lái xe nâng", type: "staff" },
+                                                { name: "Nhân viên Lái máy gắp", type: "staff" }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Điều độ kho cảng", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên Đón xe", type: "staff" },
+                                                { name: "Nhân viên Điều độ kho cảng", type: "staff" }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ Xếp dỡ hàng hóa", 
+                                            type: "team",
+                                            children: [{ name: "Công nhân Xếp dỡ", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ Kỹ thuật", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên Cơ khí", type: "staff" },
+                                                { name: "Nhân viên Sửa chữa máy", type: "staff" },
+                                                { name: "Nhân viên Kỹ thuật điện, nước", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Admin", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Vận tải",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Vận tải",
+                                    children: [
+                                        { name: "Nhân viên Điều phối xe", type: "staff" },
+                                        { name: "Nhân viên Lái xe tải", type: "staff" },
+                                        { name: "Nhân viên Lái xe điện", type: "staff" },
+                                        { name: "Nhân viên Admin", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng An ninh - An toàn",
+                                    type: "dept",
+                                    manager: "Trưởng phòng An ninh - An toàn",
+                                    children: [
+                                        { 
+                                            name: "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)", 
+                                            type: "sub",
+                                            children: [{ name: "Nhân viên Y tế", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ An ninh", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên An ninh trực chốt cố định", type: "staff" },
+                                                { name: "Nhân viên An ninh tuần tra", type: "staff" }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Kế hoạch - Dự án",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Kế hoạch - Dự án",
+                                    children: [
+                                        { 
+                                            name: "Phó phòng Pháp lý dự án", 
+                                            type: "sub",
+                                            children: [{ name: "Chuyên viên Kế hoạch", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng Ban Quản lý dự án", 
+                                            type: "sub",
+                                            children: [
+                                                { name: "Kỹ sư Xây dựng", type: "staff" },
+                                                { name: "Kỹ sư Cơ điện", type: "staff" },
+                                                { name: "Quản lý khối lượng (QS)", type: "staff" },
+                                                { name: "An toàn lao động", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Dự toán và Thanh toán", type: "staff" },
+                                        { name: "Quản lý Thiết kế", type: "staff" },
+                                        { 
+                                            name: "Quản lý Tiến độ và Chất lượng", 
+                                            type: "sub",
+                                            children: [{ name: "Kỹ sư Cơ điện, Xây dựng", type: "staff" }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Tổ hợp Dịch vụ",
+                                    type: "dept",
+                                    manager: "Quản lý dịch vụ",
+                                    children: [
+                                        { name: "Bộ phận Bếp", type: "team" },
+                                        { name: "Bộ phận Nhà hàng", type: "team" },
+                                        { name: "Bộ phận Buồng phòng", type: "team" },
+                                        { name: "Bộ phận Lễ tân", type: "team" }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        function createNodeHTML(node, level = 0) {
+            const hasChildren = node.children && node.children.length > 0;
+            const isOpenClass = level < 2 ? "active" : "";
+            const isRoot = node.type === "root";
+            
+            // Define styling based on node type
+            let bgClass, textClass, borderClass;
+
+            switch(node.type) {
+                case "root":
+                    bgClass = "bg-blue-700 shadow-lg shadow-blue-200";
+                    textClass = "text-white text-lg";
+                    borderClass = "border-blue-800";
+                    break;
+                case "board":
+                    bgClass = "bg-white shadow-md shadow-slate-200 border-l-4 border-l-blue-600";
+                    textClass = "text-slate-800 text-lg";
+                    borderClass = "border-slate-200";
+                    break;
+                case "executive":
+                    bgClass = "bg-white shadow-md shadow-rose-100 border-l-4 border-l-rose-500";
+                    textClass = "text-slate-800 text-lg";
+                    borderClass = "border-slate-200";
+                    break;
+                case "dept":
+                    bgClass = "bg-white shadow-sm border-l-4 border-l-indigo-500";
+                    textClass = "text-slate-800 font-bold";
+                    borderClass = "border-slate-200";
+                    break;
+                case "sub":
+                    bgClass = "bg-slate-50 border-l-4 border-l-sky-500";
+                    textClass = "text-slate-700 font-semibold";
+                    borderClass = "border-slate-200";
+                    break;
+                case "team":
+                    bgClass = "bg-white border border-emerald-200 border-l-4 border-l-emerald-500";
+                    textClass = "text-slate-700 font-medium";
+                    borderClass = "";
+                    break;
+                case "staff":
+                    bgClass = "bg-transparent hover:bg-white border border-dashed border-slate-300";
+                    textClass = "text-slate-500 font-normal text-sm";
+                    borderClass = "";
+                    break;
+                default:
+                    bgClass = "bg-white";
+                    textClass = "text-slate-800";
+                    borderClass = "border-slate-200";
+            }
+
+            const html = `
+                <div class="node-wrapper ml-${level > 0 ? '8' : '0'} my-3">
+                    <div class="node-trigger flex items-center p-3 sm:p-4 rounded-xl cursor-pointer transition-all ${bgClass} ${borderClass}" 
+                         onclick="toggleChildren(this)">
+                        
+                        <div class="flex-shrink-0 mr-3 w-6 flex justify-center">
+                            ${hasChildren ? `
+                                <div class="bg-slate-100 rounded-full p-1 hover:bg-blue-100 transition-colors">
+                                    <svg class="chevron w-4 h-4 ${isOpenClass} text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            ` : `
+                                <div class="w-2 h-2 rounded-full ${node.type === 'staff' ? 'bg-slate-300' : 'bg-slate-400'}"></div>
+                            `}
+                        </div>
+
+                        <div class="flex-grow">
+                            <h3 class="${textClass} leading-snug tracking-tight">${node.name}</h3>
+                            ${node.manager ? `
+                                <div class="flex items-center mt-1.5 text-indigo-600">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    <p class="text-[11px] uppercase tracking-wider font-bold">${node.manager}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${hasChildren ? `
+                        <div class="children-container line-branch mt-2 pl-4 ${isOpenClass}">
+                            ${node.children.map(child => createNodeHTML(child, level + 1)).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            return html;
+        }
+
+        function toggleChildren(element) {
+            const container = element.nextElementSibling;
+            const chevron = element.querySelector('.chevron');
+            if (container && container.classList.contains('children-container')) {
+                const isActive = container.classList.contains('active');
+                
+                if (isActive) {
+                    container.classList.remove('active');
+                    if (chevron) chevron.classList.remove('active');
+                } else {
+                    container.classList.add('active');
+                    if (chevron) chevron.classList.add('active');
+                }
+            }
+        }
+
+        // Initialize chart
+        document.getElementById('org-chart-root').innerHTML = createNodeHTML(orgData);
+
+    </script>
+</body>
+</html>

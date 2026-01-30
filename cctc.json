@@ -1,0 +1,398 @@
+{
+  "name": "Đại Hội đồng Cổ đông",
+  "type": "Board",
+  "children": [
+    {
+      "name": "Hội đồng Quản trị",
+      "type": "Board",
+      "children": [
+        {
+          "name": "Ban Tổng Giám đốc",
+          "type": "Executive",
+          "children": [
+            {
+              "name": "Ban Giám sát Vận hành",
+              "type": "Department",
+              "manager": "Trưởng Ban",
+              "children": [
+                {
+                  "name": "Chuyên viên GS Vận hành",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Phòng Kinh doanh",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Phó phòng Kinh doanh",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "BP KD Nội địa",
+                      "type": "Team",
+                      "children": [
+                        {
+                          "name": "NV KD Nội địa",
+                          "type": "Staff"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "BP KD Quốc tế",
+                      "type": "Team",
+                      "children": [
+                        {
+                          "name": "NV KD Quốc tế",
+                          "type": "Staff"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "BP CSKH",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV CSKH",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "BP XNK",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV XNK",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "BP Marketing",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "CV Marketing",
+                      "type": "Staff"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Phòng Tài chính - Kế toán",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Phó phòng TC-KT",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "NV Kế toán Thuế",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV KT Doanh thu",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV KT Thanh toán",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Kế toán CB",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "NV Thủ quỹ",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Phòng HC - NS",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Phó phòng HC-NS",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "Tổ CNTT",
+                      "type": "Team",
+                      "children": [
+                        {
+                          "name": "NV CNTT",
+                          "type": "Staff"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CV HC-NS",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "CV Pháp chế",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "Tổ Tạp vụ",
+                      "type": "Team",
+                      "children": [
+                        {
+                          "name": "NV Tạp vụ",
+                          "type": "Staff"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Phòng Thẩm định MH",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Phó phòng TĐMH (1)",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "CV TĐMH Vận hành, DV",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Phó phòng TĐMH (2)",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "CV TĐMH Dự án",
+                      "type": "Staff"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Phòng Vận hành",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Tổ Cơ giới",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV Cẩu giàn",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Xe nâng",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Cầu TH",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Máy gắp",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Phụ cầu",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Tổ Điều độ",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV Đón xe",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Điều độ",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Tổ Xếp dỡ",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "CN Xếp dỡ",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Tổ Kỹ thuật",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV Cơ khí",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Sửa chữa máy",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV Điện nước",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "NV Admin",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Phòng Vận tải",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "NV Điều phối xe",
+                  "type": "Staff"
+                },
+                {
+                  "name": "NV Lái xe",
+                  "type": "Staff"
+                },
+                {
+                  "name": "NV Lái xe điện",
+                  "type": "Staff"
+                },
+                {
+                  "name": "NV Admin",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Phòng An ninh - An toàn",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "CV HSSE",
+                  "type": "Staff"
+                },
+                {
+                  "name": "Tổ An ninh",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "NV AN Chốt",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "NV AN Tuần tra",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "NV Y tế",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Phòng Kế hoạch - Dự án",
+              "type": "Department",
+              "manager": "Trưởng phòng",
+              "children": [
+                {
+                  "name": "Phó phòng Pháp lý",
+                  "type": "Manager",
+                  "children": [
+                    {
+                      "name": "CV Kế hoạch",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Ban QLDA",
+                  "type": "Team",
+                  "children": [
+                    {
+                      "name": "Kỹ sư XD",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "Kỹ sư ME",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "QS",
+                      "type": "Staff"
+                    },
+                    {
+                      "name": "ATLĐ",
+                      "type": "Staff"
+                    }
+                  ]
+                },
+                {
+                  "name": "Dự toán, TT",
+                  "type": "Staff"
+                },
+                {
+                  "name": "QL Thiết kế",
+                  "type": "Staff"
+                },
+                {
+                  "name": "QL Tiến độ, CL",
+                  "type": "Staff"
+                }
+              ]
+            },
+            {
+              "name": "Tổ hợp Dịch vụ",
+              "type": "Unit",
+              "manager": "Quản lý",
+              "children": [
+                {
+                  "name": "Bếp",
+                  "type": "Staff"
+                },
+                {
+                  "name": "Nhà hàng",
+                  "type": "Staff"
+                },
+                {
+                  "name": "Buồng phòng",
+                  "type": "Staff"
+                },
+                {
+                  "name": "Lễ tân",
+                  "type": "Staff"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

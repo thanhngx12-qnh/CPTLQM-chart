@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Tổ chức Tà Lùng Quang Minh 2026 - Advanced View</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 50;
+            flex-shrink: 0;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+        }
+
+        #sidebar.collapsed {
+            margin-left: -320px;
+        }
+
+        /* --- MAIN AREA --- */
+        #main-area {
+            flex: 1;
+            position: relative;
+            background-color: #f1f5f9;
+            /* Lưới nền kỹ thuật */
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chart-viewport {
+            flex: 1;
+            overflow: auto; /* Native scroll for Tree, managed via JS for Mindmap */
+            display: block;
+            position: relative;
+        }
+        
+        /* Cursor styles for Mindmap */
+        .cursor-grab { cursor: grab; }
+        .cursor-grabbing { cursor: grabbing; }
+
+        /* --- VIEW MODE: TREE (Danh sách) STYLES --- */
+        .tree-view-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 100px 20px;
+        }
+        
+        .node-item {
+            transition: all 0.2s;
+        }
+        .node-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Đường nối trong Treeview */
+        .children-container {
+            display: none;
+            position: relative;
+            margin-left: 2rem;
+            padding-left: 1.5rem;
+            border-left: 2px dashed #cbd5e1;
+            animation: slideDown 0.2s ease-out;
+        }
+        .children-container.active { display: block; }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chevron { transition: transform 0.2s; }
+        .chevron.active { transform: rotate(90deg); }
+
+        /* --- VIEW MODE: MINDMAP STYLES --- */
+        .mindmap-container {
+            transform-origin: top center;
+            width: max-content; 
+            margin: 0 auto;
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 100px;
+        }
+
+        .mindmap-tree ul {
+            padding-top: 40px; 
+            position: relative;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center;
+        }
+
+        .mindmap-tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 40px 10px 0 10px;
+            transition: all 0.5s;
+        }
+
+        /* Connectors - Đường nối Mindmap */
+        .mindmap-tree li::before, .mindmap-tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #94a3b8; width: 50%; height: 40px;
+        }
+        .mindmap-tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .mindmap-tree li:only-child::after, .mindmap-tree li:only-child::before { display: none; }
+        .mindmap-tree li:only-child { padding-top: 0; }
+        .mindmap-tree li:first-child::before, .mindmap-tree li:last-child::after { border: 0 none; }
+        .mindmap-tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .mindmap-tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .mindmap-tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #94a3b8; width: 0; height: 40px;
+        }
+
+        /* Card Styles */
+        .mm-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 10;
+            min-width: 160px;
+            max-width: 240px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .mm-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            z-index: 20;
+            border-color: #3b82f6;
+        }
+
+        /* --- STYLES FOR ORGANIZATION TYPES (Cấu hình màu sắc) --- */
+        
+        /* 1. Root: ĐHĐCĐ */
+        .type-root { background: #0f172a; color: white !important; border-top: 4px solid #f59e0b; }
+        .type-root .card-title { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* 2. Board: HĐQT */
+        .type-board { background: #fffbeb; border-top: 4px solid #d97706; }
+        .type-board .card-title { color: #92400e; font-weight: 800; }
+
+        /* 3. Executive: Ban TGĐ */
+        .type-executive { background: #fef2f2; border-top: 4px solid #dc2626; }
+        .type-executive .card-title { color: #991b1b; font-weight: 800; }
+
+        /* 4. Department: Phòng ban */
+        .type-dept { background: #eff6ff; border-top: 3px solid #2563eb; }
+        .type-dept .card-title { color: #1e40af; font-weight: 700; }
+
+        /* 5. Sub-Manager/Team: Phó phòng, Tổ trưởng */
+        .type-sub, .type-team { background: #f0f9ff; border-top: 3px solid #0ea5e9; }
+        .type-sub .card-title { color: #0369a1; }
+
+        /* 6. Staff: Nhân viên */
+        .type-staff { background: #ffffff; border-top: 2px solid #94a3b8; border-style: solid; }
+        .type-staff .card-title { color: #334155; font-weight: 500; font-size: 11px; }
+
+        /* Highlight Search */
+        .highlight {
+            border: 3px solid #facc15 !important;
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.3) !important;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(250, 204, 21, 0);} 100% {box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);} }
+
+        /* Badges */
+        .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-top: 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .badge-gold { background: #fef3c7; color: #b45309; }
+        .badge-red { background: #fee2e2; color: #b91c1c; }
+        .badge-blue { background: #dbeafe; color: #1d4ed8; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        
+        /* Collapse Btn Mindmap */
+        .mm-collapse-btn {
+            width: 20px; height: 20px; background: #fff; border: 1px solid #cbd5e1; border-radius: 50%;
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;
+            font-size: 14px; color: #64748b; line-height: 1; transition: all 0.2s;
+        }
+        .mm-collapse-btn:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+        .hidden-children ul { display: none !important; }
+        .hidden-children .mm-collapse-btn::after { content: '+'; }
+        .visible-children .mm-collapse-btn::after { content: '-'; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="collapsed">
+        <div class="p-5 bg-slate-900 text-white flex justify-between items-center shadow-md">
+            <h2 class="font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+                <i class="fas fa-sitemap text-amber-400"></i> Cấu Hình Sơ Đồ
+            </h2>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="p-5 bg-white border-b space-y-4">
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase block mb-2">Chế độ hiển thị</label>
+                <div class="flex bg-slate-100 p-1 rounded-lg">
+                    <button onclick="switchView('mindmap')" id="btn-mindmap" class="flex-1 py-2 text-xs font-bold rounded-md shadow-sm bg-white text-blue-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-project-diagram"></i> Mindmap
+                    </button>
+                    <button onclick="switchView('tree')" id="btn-tree" class="flex-1 py-2 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-list-ul"></i> Danh sách
+                    </button>
+                </div>
+            </div>
+            
+            <div class="h-px bg-slate-200"></div>
+            
+            <button onclick="exportJsonData()" class="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2.5 rounded text-xs font-bold hover:bg-slate-50 transition shadow-sm">
+                <i class="fas fa-download text-green-600"></i> Xuất Dữ Liệu JSON
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col p-4 bg-slate-50 overflow-hidden border-t border-slate-200">
+            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2">Dữ liệu nguồn (JSON)</label>
+            <textarea id="json-input" class="flex-1 w-full p-3 text-[10px] font-mono border border-slate-300 rounded shadow-inner outline-none focus:border-blue-500 resize-none text-slate-700" spellcheck="false"></textarea>
+            <button onclick="updateDataFromInput()" class="mt-3 w-full bg-slate-800 text-white py-2.5 rounded text-xs font-bold hover:bg-slate-700 shadow transition">Cập nhật Sơ đồ</button>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main-area">
+        <button id="show-sidebar-btn" onclick="toggleSidebar()" class="absolute top-5 left-5 z-40 bg-white w-10 h-10 rounded-full shadow-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 transition hover:scale-110">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Toolbar -->
+        <div id="toolbar" class="absolute top-5 left-0 right-0 px-6 flex justify-between pointer-events-none z-30">
+            <!-- View Switcher (Quick Access) -->
+            <div class="pointer-events-auto bg-white/90 backdrop-blur-md shadow-lg border border-slate-200 rounded-full p-1.5 flex items-center gap-1 ml-auto md:ml-16 transition-all duration-300" id="top-view-switch" style="margin-left: 70px;">
+                <button onclick="switchView('mindmap')" id="top-btn-mindmap" class="w-9 h-9 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 transition shadow-sm" title="Chế độ Mindmap">
+                    <i class="fas fa-project-diagram text-sm"></i>
+                </button>
+                <button onclick="switchView('tree')" id="top-btn-tree" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition" title="Chế độ Danh sách">
+                    <i class="fas fa-list-ul text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="pointer-events-auto bg-white/90 backdrop-blur-md shadow-lg border border-slate-200 rounded-full pl-4 pr-2 py-2 flex items-center gap-3 w-64 md:w-80 ml-4 group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                <i class="fas fa-search text-slate-400 group-focus-within:text-blue-500"></i>
+                <input type="text" id="search-input" placeholder="Tìm tên, chức vụ, phòng ban..." class="bg-transparent text-sm outline-none w-full text-slate-700 font-medium" onkeyup="performSearch()">
+            </div>
+
+            <!-- Zoom Controls -->
+            <div id="zoom-controls" class="pointer-events-auto flex items-center gap-1.5 bg-white/90 backdrop-blur-md p-1.5 rounded-lg shadow-lg border border-slate-200 text-slate-600 ml-auto">
+                <button onclick="zoom(-0.1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-md transition"><i class="fas fa-minus"></i></button>
+                <button onclick="zoom(0.1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-md transition"><i class="fas fa-plus"></i></button>
+                <div class="w-px h-5 bg-slate-300 mx-1"></div>
+                <button onclick="centerMindmap()" class="w-9 h-9 flex items-center justify-center hover:bg-blue-50 rounded-md transition text-blue-600" title="Đưa về giữa"><i class="fas fa-compress-arrows-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Viewport -->
+        <div id="chart-viewport">
+            <div id="content-mount-point">
+                <!-- Content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DỮ LIỆU TỔ CHỨC ---
+        const orgData = {
+            name: "Đại Hội đồng Cổ đông",
+            type: "root",
+            children: [
+                {
+                    name: "Hội đồng Quản trị",
+                    type: "board",
+                    children: [
+                        {
+                            name: "Ban Tổng Giám đốc",
+                            type: "executive",
+                            children: [
+                                {
+                                    name: "Ban Giám sát Vận hành",
+                                    type: "dept",
+                                    manager: "Trưởng Ban Giám sát Vận hành",
+                                    children: [{ name: "Chuyên viên Giám sát Vận hành", type: "staff" }]
+                                },
+                                {
+                                    name: "Phòng Kinh doanh",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Kinh doanh",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Kinh doanh",
+                                            type: "sub",
+                                            children: [
+                                                { 
+                                                    name: "Bộ phận Kinh doanh Nội địa", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Kinh doanh Nội địa", type: "staff" }]
+                                                },
+                                                { 
+                                                    name: "Bộ phận Kinh doanh Quốc tế", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Kinh doanh Quốc tế", type: "staff" }]
+                                                }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Chăm sóc khách hàng", 
+                                            type: "team",
+                                            children: [{ name: "Nhân viên Chăm sóc khách hàng", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Xuất nhập khẩu", 
+                                            type: "team",
+                                            children: [{ name: "Nhân viên Xuất nhập khẩu", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng bộ phận Marketing", 
+                                            type: "team",
+                                            children: [{ name: "Chuyên viên Marketing", type: "staff" }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Tài chính - Kế toán",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Tài chính - Kế toán",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Tài chính - Kế toán",
+                                            type: "sub",
+                                            children: [
+                                                { name: "Nhân viên Kế toán Thuế", type: "staff" },
+                                                { name: "Nhân viên Kế toán Doanh thu", type: "staff" },
+                                                { name: "Nhân viên Kế toán Thanh toán", type: "staff" },
+                                                { name: "Nhân viên Kế toán tại Cao Bằng", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Thủ quỹ", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Hành chính - Nhân sự",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Hành chính - Nhân sự",
+                                    children: [
+                                        {
+                                            name: "Phó phòng Hành chính - Nhân sự",
+                                            type: "sub",
+                                            children: [
+                                                { 
+                                                    name: "Tổ trưởng Tổ Công nghệ thông tin", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Công nghệ thông tin", type: "staff" }]
+                                                },
+                                                { name: "Chuyên viên Hành chính - Nhân sự", type: "staff" },
+                                                { name: "Chuyên viên Pháp chế", type: "staff" },
+                                                { 
+                                                    name: "Tổ trưởng Tổ Tạp vụ", 
+                                                    type: "team",
+                                                    children: [{ name: "Nhân viên Tạp vụ", type: "staff" }]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Thẩm định mua hàng",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Thẩm định mua hàng",
+                                    children: [
+                                        { 
+                                            name: "Phó phòng Thẩm định mua hàng (Vận hành, Dịch vụ)", 
+                                            type: "sub", 
+                                            children: [{name: "Chuyên viên Thẩm định mua hàng vận hành, dịch vụ", type: "staff"}] 
+                                        },
+                                        { 
+                                            name: "Phó phòng Thẩm định mua hàng (Dự án)", 
+                                            type: "sub", 
+                                            children: [{name: "Chuyên viên Thẩm định mua hàng dự án", type: "staff"}] 
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Vận hành",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Vận hành",
+                                    children: [
+                                        { 
+                                            name: "Tổ trưởng Tổ Cơ giới", 
+                                            type: "team",
+                                            children: [
+                                                { 
+                                                    name: "Nhân viên Vận hành Cẩu giàn", 
+                                                    type: "sub", // Cấp trung gian để chứa con
+                                                    children: [{ name: "Nhân viên Phụ cầu", type: "staff" }]
+                                                },
+                                                { 
+                                                    name: "Nhân viên Vận hành Cầu tổng hợp", 
+                                                    type: "sub", // Cấp trung gian để chứa con
+                                                    children: [{ name: "Nhân viên Phụ cầu", type: "staff" }]
+                                                },
+                                                { name: "Nhân viên Lái xe nâng", type: "staff" },
+                                                { name: "Nhân viên Lái máy gắp", type: "staff" }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Điều độ kho cảng", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên Đón xe", type: "staff" },
+                                                { name: "Nhân viên Điều độ kho cảng", type: "staff" }
+                                            ]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ Xếp dỡ hàng hóa", 
+                                            type: "team",
+                                            children: [{ name: "Công nhân Xếp dỡ", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ Kỹ thuật", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên Cơ khí", type: "staff" },
+                                                { name: "Nhân viên Sửa chữa máy", type: "staff" },
+                                                { name: "Nhân viên Kỹ thuật điện, nước", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Admin", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Vận tải",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Vận tải",
+                                    children: [
+                                        { name: "Nhân viên Điều phối xe", type: "staff" },
+                                        { name: "Nhân viên Lái xe tải", type: "staff" },
+                                        { name: "Nhân viên Lái xe điện", type: "staff" },
+                                        { name: "Nhân viên Admin", type: "staff" }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng An ninh - An toàn",
+                                    type: "dept",
+                                    manager: "Trưởng phòng An ninh - An toàn",
+                                    children: [
+                                        { 
+                                            name: "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)", 
+                                            type: "sub",
+                                            children: [{ name: "Nhân viên Y tế", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ An ninh", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên An ninh trực chốt cố định", type: "staff" },
+                                                { name: "Nhân viên An ninh tuần tra", type: "staff" }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Phòng Kế hoạch - Dự án",
+                                    type: "dept",
+                                    manager: "Trưởng phòng Kế hoạch - Dự án",
+                                    children: [
+                                        { 
+                                            name: "Phó phòng Pháp lý dự án", 
+                                            type: "sub",
+                                            children: [{ name: "Chuyên viên Kế hoạch", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Trưởng Ban Quản lý dự án", 
+                                            type: "sub",
+                                            children: [
+                                                { name: "Kỹ sư Xây dựng", type: "staff" },
+                                                { name: "Kỹ sư Cơ điện", type: "staff" },
+                                                { name: "Quản lý khối lượng (QS)", type: "staff" },
+                                                { name: "An toàn lao động", type: "staff" }
+                                            ]
+                                        },
+                                        { name: "Nhân viên Dự toán và Thanh toán", type: "staff" },
+                                        { name: "Quản lý Thiết kế", type: "staff" },
+                                        { 
+                                            name: "Quản lý Tiến độ và Chất lượng", 
+                                            type: "sub",
+                                            children: [{ name: "Kỹ sư Cơ điện, Xây dựng", type: "staff" }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Tổ hợp Dịch vụ",
+                                    type: "dept",
+                                    manager: "Quản lý dịch vụ",
+                                    children: [
+                                        { name: "Bộ phận Bếp", type: "team" },
+                                        { name: "Bộ phận Nhà hàng", type: "team" },
+                                        { name: "Bộ phận Buồng phòng", type: "team" },
+                                        { name: "Bộ phận Lễ tân", type: "team" }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- GLOBAL STATE ---
+        let currentView = 'mindmap'; 
+        let currentData = orgData;
+        let scale = 0.8;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        const viewport = document.getElementById('chart-viewport');
+        const contentMount = document.getElementById('content-mount-point');
+
+        // --- INITIALIZATION ---
+        document.getElementById('json-input').value = JSON.stringify(orgData, null, 2);
+        switchView('mindmap');
+
+        // --- CORE FUNCTIONS ---
+
+        function switchView(view) {
+            currentView = view;
+            
+            // Buttons Update
+            const btnMindmap = document.getElementById('btn-mindmap');
+            const btnTree = document.getElementById('btn-tree');
+            const topBtnMindmap = document.getElementById('top-btn-mindmap');
+            const topBtnTree = document.getElementById('top-btn-tree');
+            const zoomCtrl = document.getElementById('zoom-controls');
+
+            if (view === 'mindmap') {
+                // Active Mindmap Styles
+                btnMindmap.className = "flex-1 py-2 text-xs font-bold rounded-md shadow-sm bg-blue-600 text-white transition flex items-center justify-center gap-2";
+                btnTree.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition flex items-center justify-center gap-2";
+                
+                topBtnMindmap.className = "w-9 h-9 rounded-full flex items-center justify-center bg-blue-600 text-white transition shadow-md scale-105";
+                topBtnTree.className = "w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition";
+                
+                zoomCtrl.style.display = 'flex';
+                viewport.className = "cursor-grab";
+                
+                renderMindmap();
+                enableMindmapEvents();
+                setTimeout(centerMindmap, 50);
+            } else {
+                // Active Tree Styles
+                btnMindmap.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition flex items-center justify-center gap-2";
+                btnTree.className = "flex-1 py-2 text-xs font-bold rounded-md shadow-sm bg-blue-600 text-white transition flex items-center justify-center gap-2";
+                
+                topBtnMindmap.className = "w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition";
+                topBtnTree.className = "w-9 h-9 rounded-full flex items-center justify-center bg-blue-600 text-white transition shadow-md scale-105";
+                
+                zoomCtrl.style.display = 'none';
+                viewport.className = "";
+                contentMount.style.transform = 'none';
+                
+                renderTree();
+                disableMindmapEvents();
+            }
+        }
+
+        function updateDataFromInput() {
+            try {
+                const newData = JSON.parse(document.getElementById('json-input').value);
+                currentData = newData;
+                if (currentView === 'mindmap') {
+                    renderMindmap();
+                    setTimeout(centerMindmap, 50);
+                } else {
+                    renderTree();
+                }
+            } catch (e) {
+                alert("Lỗi cú pháp JSON: " + e.message);
+            }
+        }
+
+        // --- RENDERERS ---
+
+        function renderMindmap() {
+            contentMount.innerHTML = '<div class="mindmap-container"><div class="mindmap-tree"><ul id="mm-root"></ul></div></div>';
+            const rootUl = document.getElementById('mm-root');
+            rootUl.appendChild(createMindmapNode(currentData, 0));
+            updateTransform(); 
+        }
+
+        function createMindmapNode(node, level) {
+            const hasChildren = node.children && node.children.length > 0;
+            const li = document.createElement('li');
+            li.className = hasChildren ? 'visible-children' : '';
+            
+            const card = document.createElement('div');
+            card.className = `mm-card ${getTypeClass(node, level)}`;
+            
+            const content = getIconAndText(node);
+            let html = `${content.icon}<div class="font-bold text-center leading-tight card-title">${node.name}</div>`;
+            if (node.manager) html += `<div class="text-[10px] text-slate-500 mt-1 italic">${node.manager}</div>`;
+            if (content.badge) html += `<span class="badge ${content.badgeClass}">${content.badge}</span>`;
+            
+            card.innerHTML = html;
+            
+            if (hasChildren) {
+                const btn = document.createElement('div');
+                btn.className = 'mm-collapse-btn';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    li.classList.toggle('hidden-children');
+                    li.classList.toggle('visible-children');
+                };
+                card.appendChild(btn);
+            }
+            li.appendChild(card);
+
+            if (hasChildren) {
+                const ul = document.createElement('ul');
+                node.children.forEach(child => ul.appendChild(createMindmapNode(child, level + 1)));
+                li.appendChild(ul);
+            }
+            return li;
+        }
+
+        function renderTree() {
+            contentMount.innerHTML = '<div class="tree-view-container" id="tv-root"></div>';
+            const rootDiv = document.getElementById('tv-root');
+            rootDiv.appendChild(createTreeNode(currentData, 0));
+        }
+
+        function createTreeNode(node, level) {
+            const hasChildren = node.children && node.children.length > 0;
+            const wrapper = document.createElement('div');
+            wrapper.className = "mb-2";
+
+            let typeStyle = getTypeStyleForTree(node, level);
+            const content = getIconAndText(node);
+            
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = `node-item flex items-center justify-between p-3 rounded-lg border cursor-pointer shadow-sm ${typeStyle.bg}`;
+            
+            const leftDiv = document.createElement('div');
+            leftDiv.className = "flex items-center gap-3";
+            leftDiv.innerHTML = `
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg ${typeStyle.iconBg}">
+                    ${content.icon}
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm ${typeStyle.text}">${node.name}</h3>
+                    ${node.manager ? `<p class="text-[10px] opacity-75 ${typeStyle.subText}">${node.manager}</p>` : ''}
+                </div>
+            `;
+            
+            const rightDiv = document.createElement('div');
+            rightDiv.className = "flex items-center gap-2";
+            if(content.badge) {
+                rightDiv.innerHTML += `<span class="text-[10px] bg-white/50 px-2 py-0.5 rounded border border-white/20 font-semibold uppercase ${typeStyle.text}">${content.badge}</span>`;
+            }
+            if (hasChildren) {
+                // If it's Root (level 0), use white chevron, else slate
+                const chevronColor = level === 0 ? "text-blue-100" : "text-slate-400";
+                rightDiv.innerHTML += `<i class="fas fa-chevron-right chevron ${chevronColor} text-xs transition-transform"></i>`;
+            }
+            
+            nodeDiv.appendChild(leftDiv);
+            nodeDiv.appendChild(rightDiv);
+            
+            if (hasChildren) {
+                nodeDiv.onclick = function() {
+                    const childCont = wrapper.querySelector('.children-container');
+                    const chev = nodeDiv.querySelector('.chevron');
+                    if (childCont.classList.contains('active')) {
+                        childCont.classList.remove('active');
+                        chev.classList.remove('active');
+                    } else {
+                        childCont.classList.add('active');
+                        chev.classList.add('active');
+                    }
+                };
+            }
+
+            wrapper.appendChild(nodeDiv);
+
+            if (hasChildren) {
+                const childContainer = document.createElement('div');
+                childContainer.className = "children-container";
+                // Auto expand first 2 levels
+                if (level < 2) {
+                    childContainer.classList.add('active');
+                    if(nodeDiv.querySelector('.chevron')) nodeDiv.querySelector('.chevron').classList.add('active');
+                }
+
+                node.children.forEach(child => {
+                    childContainer.appendChild(createTreeNode(child, level + 1));
+                });
+                wrapper.appendChild(childContainer);
+            }
+
+            return wrapper;
+        }
+
+        // --- UTILS (Mapping Types to Styles) ---
+
+        function getTypeClass(node, level) {
+            if (node.type === 'root') return 'type-root';
+            if (node.type === 'board') return 'type-board';
+            if (node.type === 'executive') return 'type-executive';
+            if (node.type === 'dept') return 'type-dept';
+            if (node.type === 'sub' || node.type === 'manager') return 'type-sub';
+            if (node.type === 'team') return 'type-team';
+            return 'type-staff';
+        }
+
+        function getTypeStyleForTree(node, level) {
+            // FIX: Màu nền Root Node để không bị chìm
+            if (node.type === 'root') return { 
+                bg: "bg-slate-900 border-slate-900", 
+                iconBg: "bg-slate-700 text-amber-400", 
+                text: "text-white", 
+                subText: "text-slate-400" 
+            };
+            
+            switch(node.type) {
+                case 'board': return { bg: "bg-amber-50 border-l-4 border-amber-500", iconBg: "bg-amber-100 text-amber-600", text: "text-slate-900", subText: "text-slate-500" };
+                case 'executive': return { bg: "bg-red-50 border-l-4 border-red-500", iconBg: "bg-red-100 text-red-600", text: "text-slate-900", subText: "text-slate-500" };
+                case 'dept': return { bg: "bg-blue-50 border-l-4 border-blue-600", iconBg: "bg-blue-100 text-blue-600", text: "text-slate-900", subText: "text-slate-500" };
+                case 'sub': 
+                case 'manager':
+                    return { bg: "bg-sky-50 border-l-4 border-sky-400", iconBg: "bg-sky-100 text-sky-600", text: "text-slate-800", subText: "text-slate-500" };
+                case 'team': return { bg: "bg-white border-l-4 border-indigo-400", iconBg: "bg-indigo-50 text-indigo-500", text: "text-slate-700", subText: "text-slate-400" };
+                default: return { bg: "bg-white border border-slate-200", iconBg: "bg-slate-50 text-slate-400", text: "text-slate-600", subText: "text-slate-400" };
+            }
+        }
+
+        function getIconAndText(node) {
+            let icon = '';
+            let badge = '';
+            let badgeClass = 'badge-gray';
+
+            switch(node.type) {
+                case 'root': icon = '<i class="fas fa-landmark text-lg"></i>'; break;
+                case 'board': icon = '<i class="fas fa-crown text-amber-600 text-lg"></i>'; badge = 'HĐQT'; badgeClass='badge-gold'; break;
+                case 'executive': icon = '<i class="fas fa-user-tie text-red-600 text-lg"></i>'; badge = 'Ban TGĐ'; badgeClass='badge-red'; break;
+                case 'dept': icon = '<i class="fas fa-building text-blue-600"></i>'; break;
+                case 'sub': 
+                case 'manager': icon = '<i class="fas fa-user-shield text-sky-600"></i>'; break;
+                case 'team': icon = '<i class="fas fa-users text-indigo-500"></i>'; break;
+                default: icon = '<i class="fas fa-user text-slate-400"></i>'; break; // Staff
+            }
+            // Overrides for icons
+            if(node.name.includes("An ninh")) icon = '<i class="fas fa-shield-alt text-slate-500"></i>';
+            if(node.name.includes("Kế toán")) icon = '<i class="fas fa-calculator text-slate-500"></i>';
+            if(node.name.includes("Vận tải")) icon = '<i class="fas fa-truck text-slate-500"></i>';
+            if(node.name.includes("Kho")) icon = '<i class="fas fa-warehouse text-slate-500"></i>';
+
+            // Override icon color wrapper in Mindmap
+            if(node.type === 'root') icon = '<i class="fas fa-landmark text-amber-400 text-xl mb-1"></i>';
+            else icon = icon.replace('text-lg', 'mb-1'); // Adjust spacing for mindmap
+
+            return { icon, badge, badgeClass };
+        }
+
+        // --- SEARCH ---
+        function performSearch() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            
+            if (currentView === 'mindmap') {
+                const cards = document.querySelectorAll('.mm-card');
+                cards.forEach(card => {
+                    card.classList.remove('highlight');
+                    if (term.length > 1 && card.innerText.toLowerCase().includes(term)) {
+                        card.classList.add('highlight');
+                        expandParents(card, 'li');
+                        card.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
+                    }
+                });
+            } else {
+                const nodes = document.querySelectorAll('.node-item');
+                nodes.forEach(node => {
+                    // Reset highlight
+                    node.classList.remove('ring-4', 'ring-yellow-400', 'bg-yellow-50'); 
+                    
+                    if (term.length > 1 && node.innerText.toLowerCase().includes(term)) {
+                        node.classList.add('ring-4', 'ring-yellow-400', 'bg-yellow-50');
+                        expandParentsTree(node);
+                        node.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }
+                });
+            }
+        }
+        
+        function expandParents(element, parentTag) {
+            let parent = element.parentElement;
+            while(parent) {
+                if(parent.tagName === parentTag.toUpperCase() && parent.classList.contains('hidden-children')) {
+                    parent.classList.remove('hidden-children');
+                    parent.classList.add('visible-children');
+                }
+                parent = parent.parentElement;
+            }
+        }
+
+        function expandParentsTree(element) {
+            let parent = element.parentElement; 
+            while(parent) {
+                if (parent.classList.contains('children-container')) {
+                    parent.classList.add('active');
+                    const siblingNode = parent.previousElementSibling;
+                    if(siblingNode) {
+                        const icon = siblingNode.querySelector('.chevron');
+                        if(icon) icon.classList.add('active');
+                    }
+                }
+                parent = parent.parentElement;
+                if(parent.id === 'tv-root') break;
+            }
+        }
+
+        // --- ZOOM & PAN & CENTER ---
+        function updateTransform() { 
+            const mmContainer = document.querySelector('.mindmap-container');
+            if(mmContainer) mmContainer.style.transform = `scale(${scale})`; 
+        }
+        function zoom(delta) { scale = Math.max(0.2, Math.min(2, scale + delta)); updateTransform(); }
+        
+        function centerMindmap() {
+            if (currentView !== 'mindmap') return;
+            const content = document.querySelector('.mindmap-container');
+            if (!content) return;
+            
+            requestAnimationFrame(() => {
+                const viewportWidth = viewport.clientWidth;
+                // Center Horizontally
+                const scrollX = (content.scrollWidth - viewportWidth) / 2;
+                viewport.scrollTo({ left: scrollX, top: 0, behavior: 'smooth' });
+                
+                scale = 0.8; // Reset scale ideal for this chart
+                updateTransform();
+            });
+        }
+
+        function onMouseDown(e) {
+            if (currentView !== 'mindmap') return;
+            if (e.target.closest('.mm-card') || e.target.closest('button')) return;
+            isDragging = true; viewport.classList.add('cursor-grabbing');
+            startX = e.pageX - viewport.offsetLeft; startY = e.pageY - viewport.offsetTop;
+            scrollLeft = viewport.scrollLeft; scrollTop = viewport.scrollTop;
+        }
+        function onMouseUp() { isDragging = false; viewport.classList.remove('cursor-grabbing'); }
+        function onMouseMove(e) {
+            if (!isDragging || currentView !== 'mindmap') return;
+            e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft; const y = e.pageY - viewport.offsetTop;
+            viewport.scrollLeft = scrollLeft - (x - startX); 
+            viewport.scrollTop = scrollTop - (y - startY);
+        }
+
+        function enableMindmapEvents() {
+            viewport.addEventListener('mousedown', onMouseDown);
+            viewport.addEventListener('mouseup', onMouseUp);
+            viewport.addEventListener('mouseleave', onMouseUp);
+            viewport.addEventListener('mousemove', onMouseMove);
+        }
+
+        function disableMindmapEvents() {
+            viewport.removeEventListener('mousedown', onMouseDown);
+            viewport.removeEventListener('mouseup', onMouseUp);
+            viewport.removeEventListener('mouseleave', onMouseUp);
+            viewport.removeEventListener('mousemove', onMouseMove);
+        }
+
+        // --- SIDEBAR UI ---
+        const sidebar = document.getElementById('sidebar');
+        const showBtn = document.getElementById('show-sidebar-btn');
+        const searchBox = document.getElementById('search-input').parentElement;
+        const viewSwitch = document.getElementById('top-view-switch');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                showBtn.style.display = 'flex';
+                if(searchBox) searchBox.style.marginLeft = "70px";
+                if(viewSwitch) viewSwitch.style.marginLeft = "70px";
+            } else {
+                showBtn.style.display = 'none';
+                if(searchBox) searchBox.style.marginLeft = "16px"; 
+                if(viewSwitch) viewSwitch.style.marginLeft = "64px"; 
+            }
+        }
+
+        function exportJsonData() {
+            const dataStr = document.getElementById('json-input').value;
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "OrgChart_TaLung_2026.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>

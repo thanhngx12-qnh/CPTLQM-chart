@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu trúc Cây Dự án AMIS - Tà Lùng Quang Minh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Hiệu ứng đóng mở */
+        .children-container {
+            display: none;
+            position: relative;
+            margin-left: 2rem;
+            padding-left: 1rem;
+            border-left: 2px dashed #cbd5e1;
+        }
+        .children-container.active {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Chevron xoay */
+        .chevron { transition: transform 0.2s; }
+        .chevron.active { transform: rotate(90deg); }
+
+        /* Style từng node */
+        .node-item { transition: all 0.2s; }
+        .node-item:hover { background-color: #f1f5f9; }
+        
+        /* Icon styles */
+        .icon-box { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+        
+        /* Project Group Header Style */
+        .project-group-header {
+            background: linear-gradient(to right, #fff7ed, #fff);
+            border-left: 4px solid #f97316;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-10 text-slate-800">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold uppercase">Cấu trúc Dự án AMIS 2026</h1>
+                <p class="text-slate-400 text-sm mt-1">Sơ đồ thiết lập Phân hệ AMIS Công việc - Tách biệt Khối Dự án</p>
+            </div>
+            <div class="hidden md:block">
+                <span class="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full">TREE VIEW</span>
+            </div>
+        </div>
+
+        <!-- Toolbar / Legend -->
+        <div class="bg-slate-50 p-4 border-b border-slate-200 flex flex-wrap gap-4 text-sm">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded flex items-center justify-center"><i class="fa-solid fa-city"></i></span>
+                <span class="font-bold text-slate-700">Khối Dự án Trọng điểm</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 bg-blue-100 text-blue-700 rounded flex items-center justify-center"><i class="fa-solid fa-building"></i></span>
+                <span class="font-semibold text-slate-700">Phòng ban Chức năng</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 bg-slate-100 text-slate-600 rounded flex items-center justify-center"><i class="fa-solid fa-briefcase"></i></span>
+                <span class="font-medium text-slate-600">Công việc chung</span>
+            </div>
+        </div>
+
+        <!-- Tree Container -->
+        <div id="tree-root" class="p-6">
+            <!-- JS will render here -->
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu cấu trúc
+        const amisData = [
+            {
+                name: "KHỐI CÁC DỰ ÁN TRỌNG ĐIỂM",
+                type: "project_group",
+                isHighlight: true,
+                projects: [
+                    { name: "Dự án Vũ Thành", type: "key_project" },
+                    { name: "Dự án Sơn Cảng", type: "key_project" },
+                    { name: "Dự án Bảo Châu", type: "key_project" },
+                    { name: "Dự án Song Toàn", type: "key_project" }
+                ]
+            },
+            {
+                name: "Phòng Kế hoạch - Dự án",
+                type: "dept",
+                projects: [
+                    { name: "Pháp lý & Kế hoạch", type: "functional" },
+                    { name: "Quản lý Thi công (QLDA)", type: "functional" },
+                    { name: "Kỹ thuật & Kiểm soát (QS/TK)", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng Vận hành",
+                type: "dept",
+                projects: [
+                    { name: "Tổ Cơ giới (Cẩu, Xe nâng, Máy gắp)", type: "functional" },
+                    { name: "Tổ Điều độ kho cảng", type: "functional" },
+                    { name: "Tổ Xếp dỡ hàng hóa", type: "functional" },
+                    { name: "Tổ Kỹ thuật - Bảo trì", type: "functional" },
+                    { name: "Hành chính Vận hành", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng Kinh doanh",
+                type: "dept",
+                projects: [
+                    { name: "Kinh doanh Nội địa", type: "functional" },
+                    { name: "Kinh doanh Quốc tế", type: "functional" },
+                    { name: "Chăm sóc Khách hàng", type: "functional" },
+                    { name: "Xuất nhập khẩu", type: "functional" },
+                    { name: "Marketing & Truyền thông", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng Vận tải",
+                type: "dept",
+                projects: [
+                    { name: "Đội xe & Vận hành", type: "functional" },
+                    { name: "Điều phối & Hành chính", type: "functional" }
+                ]
+            },
+            {
+                name: "Tổ hợp Dịch vụ",
+                type: "dept",
+                projects: [
+                    { name: "Bộ phận Bếp", type: "functional" },
+                    { name: "Bộ phận Nhà hàng", type: "functional" },
+                    { name: "Bộ phận Buồng phòng", type: "functional" },
+                    { name: "Bộ phận Lễ tân", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng HC - NS",
+                type: "dept",
+                projects: [
+                    { name: "Nhân sự & Pháp chế", type: "functional" },
+                    { name: "Tổ Công nghệ thông tin", type: "functional" },
+                    { name: "Tổ Tạp vụ & Hành chính", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng Tài chính - Kế toán",
+                type: "dept",
+                projects: [
+                    { name: "Nghiệp vụ Kế toán", type: "functional" },
+                    { name: "Quản lý Doanh thu & Quỹ", type: "functional" },
+                    { name: "Kế toán Chi nhánh Cao Bằng", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng An ninh - An toàn",
+                type: "dept",
+                projects: [
+                    { name: "Tổ An ninh (Chốt & Tuần tra)", type: "functional" },
+                    { name: "An toàn HSSE & Y tế", type: "functional" }
+                ]
+            },
+            {
+                name: "Phòng Thẩm định mua hàng",
+                type: "dept",
+                projects: [
+                    { name: "Thẩm định MH Vận hành & Dịch vụ", type: "functional" },
+                    { name: "Thẩm định MH Dự án", type: "functional" }
+                ]
+            },
+            {
+                name: "Ban Giám sát Vận hành",
+                type: "dept",
+                projects: [
+                    { name: "Hoạt động Giám sát Vận hành", type: "functional" }
+                ]
+            }
+        ];
+
+        const container = document.getElementById('tree-root');
+
+        // Hàm tạo HTML cho từng phòng ban
+        function renderTree() {
+            let html = '';
+            
+            amisData.forEach(dept => {
+                // Tạo danh sách dự án con
+                let projectsHtml = '';
+                
+                // Nếu là Dept thường thì thêm 2 dự án mặc định
+                if (dept.type === "dept") {
+                    // 1. Công việc chung (Mặc định)
+                    projectsHtml += `
+                        <div class="flex items-center gap-3 p-2 rounded hover:bg-slate-50 border-l-2 border-transparent hover:border-blue-500">
+                            <div class="w-6 flex justify-center"><i class="fa-solid fa-briefcase text-blue-600 text-sm"></i></div>
+                            <span class="text-sm font-semibold text-slate-700">Công việc chung</span>
+                        </div>
+                    `;
+                    
+                    // 2. Xử lý văn bản (Mặc định)
+                    projectsHtml += `
+                        <div class="flex items-center gap-3 p-2 rounded hover:bg-slate-50 border-l-2 border-transparent hover:border-purple-500">
+                            <div class="w-6 flex justify-center"><i class="fa-solid fa-file-signature text-purple-600 text-sm"></i></div>
+                            <span class="text-sm font-semibold text-slate-700">Xử lý văn bản</span>
+                        </div>
+                    `;
+                }
+
+                // 3. Render các dự án con
+                dept.projects.forEach(proj => {
+                    let iconClass = "fa-layer-group text-slate-400";
+                    let textClass = "text-slate-600";
+                    let borderHover = "hover:border-slate-400";
+                    let bgHover = "hover:bg-slate-50";
+
+                    if (proj.type === "key_project") {
+                        iconClass = "fa-city text-amber-600";
+                        textClass = "text-amber-800 font-bold uppercase text-xs tracking-wide";
+                        borderHover = "hover:border-amber-500";
+                        bgHover = "bg-amber-50 hover:bg-amber-100";
+                    }
+
+                    projectsHtml += `
+                        <div class="flex items-center gap-3 p-2 rounded ${bgHover} border-l-2 border-transparent ${borderHover}">
+                            <div class="w-6 flex justify-center"><i class="fa-solid ${iconClass} text-sm"></i></div>
+                            <span class="text-sm ${textClass}">${proj.name}</span>
+                        </div>
+                    `;
+                });
+
+                // HTML cho Header Nhóm
+                let deptBg = "bg-white border-slate-200";
+                let iconHeader = '<i class="fa-solid fa-building"></i>';
+                let iconBoxClass = "bg-blue-100 text-blue-700";
+                let titleClass = "text-slate-800";
+                
+                if (dept.type === "project_group") {
+                    deptBg = "project-group-header border-orange-200";
+                    iconHeader = '<i class="fa-solid fa-city"></i>';
+                    iconBoxClass = "bg-orange-100 text-orange-600";
+                    titleClass = "text-orange-900 font-extrabold uppercase";
+                }
+                
+                html += `
+                    <div class="mb-3">
+                        <div class="node-item flex items-center justify-between p-3 rounded-lg border cursor-pointer shadow-sm ${deptBg}" onclick="toggleNode(this)">
+                            <div class="flex items-center gap-3">
+                                <div class="icon-box ${iconBoxClass}">
+                                    ${iconHeader}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold ${titleClass}">${dept.name}</h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs bg-white/50 text-slate-500 px-2 py-1 rounded-full font-medium border border-slate-100">
+                                    ${dept.projects.length + (dept.type === "dept" ? 2 : 0)} Dự án
+                                </span>
+                                <i class="fa-solid fa-chevron-right chevron text-slate-400 text-xs transition-transform"></i>
+                            </div>
+                        </div>
+                        <div class="children-container mt-1 bg-white">
+                            ${projectsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Hàm xử lý đóng mở
+        window.toggleNode = function(element) {
+            const container = element.nextElementSibling;
+            const chevron = element.querySelector('.chevron');
+            
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+                chevron.classList.remove('active');
+            } else {
+                container.classList.add('active');
+                chevron.classList.add('active');
+            }
+        }
+
+        renderTree();
+    </script>
+</body>
+</html>

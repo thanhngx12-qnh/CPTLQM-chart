@@ -1,0 +1,172 @@
+{
+  "root": {
+    "id": "ROOT_COMPANY",
+    "topic": "CÔNG TY CP TÀ LÙNG QUANG MINH",
+    "children": [
+      {
+        "id": "BRANCH_MANAGERS",
+        "topic": "⭐ NHÓM CÁN BỘ QUẢN LÝ (Giao việc Lãnh đạo)",
+        "description": "Khu vực giao việc trực tiếp cho các cấp quản lý, không đi vào chi tiết chuyên môn.",
+        "background_color": "#FFD700",
+        "children": [
+          { "id": "MGR_01", "topic": "Ban Tổng Giám đốc", "roles": ["Tổng Giám Đốc", "HĐQT"] },
+          { "id": "MGR_02", "topic": "TP. Hành chính - Nhân sự", "roles": ["Trưởng phòng HC-NS"] },
+          { "id": "MGR_03", "topic": "TP. Tài chính - Kế toán", "roles": ["Trưởng phòng TC-KT"] },
+          { "id": "MGR_04", "topic": "TP. Kinh doanh", "roles": ["Trưởng phòng KD"] },
+          { "id": "MGR_05", "topic": "TP. Vận hành", "roles": ["Trưởng phòng VH"] },
+          { "id": "MGR_06", "topic": "TP. Vận tải", "roles": ["Trưởng phòng VT"] },
+          { "id": "MGR_07", "topic": "TP. An ninh - An toàn", "roles": ["Trưởng phòng AN-AT"] },
+          { "id": "MGR_08", "topic": "TP. Kế hoạch - Dự án", "roles": ["Trưởng phòng KH-DA"] },
+          { "id": "MGR_09", "topic": "TP. Thẩm định Mua hàng", "roles": ["Trưởng phòng TĐMH"] },
+          { "id": "MGR_10", "topic": "PM - Vũ Thành", "roles": ["GĐ Dự án Vũ Thành"] },
+          { "id": "MGR_11", "topic": "PM - Sơn Cảng", "roles": ["GĐ Dự án Sơn Cảng"] },
+          { "id": "MGR_12", "topic": "PM - Bảo Châu", "roles": ["GĐ Dự án Bảo Châu"] },
+          { "id": "MGR_13", "topic": "PM - Song Toàn", "roles": ["GĐ Dự án Song Toàn"] },
+          { "id": "MGR_14", "topic": "Quản lý Dịch vụ", "roles": ["Quản lý Tổ hợp DV"] }
+        ]
+      },
+      {
+        "id": "BRANCH_DEPARTMENTS",
+        "topic": "🏢 KHỐI PHÒNG BAN CHỨC NĂNG",
+        "children": [
+          {
+            "id": "DEPT_BGD",
+            "topic": "Ban Tổng Giám đốc",
+            "children": [
+              { "id": "BGD_GEN", "topic": "Công việc chung (Lãnh đạo)", "roles": ["HĐQT", "TGĐ"] },
+              { "id": "BGD_ADM", "topic": "Xử lý văn bản & Thư ký", "roles": ["Thư ký HĐQT", "Trợ lý TGĐ"] },
+              { "id": "BGD_FUNC", "topic": "Giám sát Vận hành", "roles": ["Trưởng ban GS", "Chuyên viên GS"] }
+            ]
+          },
+          {
+            "id": "DEPT_HCNS",
+            "topic": "Phòng Hành chính - Nhân sự",
+            "children": [
+              { "id": "HCNS_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng HC-NS"] },
+              { "id": "HCNS_ADM", "topic": "Xử lý văn bản & Văn thư", "roles": ["Chuyên viên HC-NS", "Văn thư"] },
+              { "id": "HCNS_HR", "topic": "Nghiệp vụ Nhân sự & Pháp chế", "roles": ["Phó phòng HC-NS", "CV Pháp chế"] },
+              { "id": "HCNS_IT", "topic": "CNTT & Hậu cần", "roles": ["Tổ CNTT", "Tổ Tạp vụ"] }
+            ]
+          },
+          {
+            "id": "DEPT_TCKT",
+            "topic": "Phòng Tài chính - Kế toán",
+            "children": [
+              { "id": "TCKT_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng TC-KT"] },
+              { "id": "TCKT_ADM", "topic": "Xử lý văn bản & Chứng từ", "roles": ["NV Kế toán (Admin)", "Thủ quỹ"] },
+              { "id": "TCKT_FUNC", "topic": "Nghiệp vụ Kế toán", "roles": ["Phó phòng", "KT Thuế", "KT Doanh thu", "KT Thanh toán"] }
+            ]
+          },
+          {
+            "id": "DEPT_KD",
+            "topic": "Phòng Kinh doanh",
+            "children": [
+              { "id": "KD_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng KD"] },
+              { "id": "KD_ADM", "topic": "Xử lý văn bản & Hợp đồng", "roles": ["Admin Kinh doanh", "CSKH"] },
+              { "id": "KD_SALE", "topic": "Phát triển thị trường (Sales)", "roles": ["Phó phòng KD", "Sales Nội địa", "Sales Quốc tế"] },
+              { "id": "KD_SUP", "topic": "Hỗ trợ (XNK & MKT)", "roles": ["TBP XNK", "NV XNK", "TBP Marketing", "CV Marketing"] }
+            ]
+          },
+          {
+            "id": "DEPT_VH",
+            "topic": "Phòng Vận hành (Kho/Cảng)",
+            "children": [
+              { "id": "VH_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng VH"] },
+              { "id": "VH_ADM", "topic": "Xử lý văn bản & Admin Kho", "roles": ["NV Admin", "NV Điều độ"] },
+              { "id": "VH_MECH", "topic": "Tổ Cơ giới & Kỹ thuật", "roles": ["Tổ Cơ giới (Cẩu/Xe nâng)", "Tổ Kỹ thuật (Cơ khí/Điện)"] },
+              { "id": "VH_LOAD", "topic": "Tổ Xếp dỡ & Điều độ", "roles": ["Tổ Xếp dỡ", "NV Đón xe"] }
+            ]
+          },
+          {
+            "id": "DEPT_VT",
+            "topic": "Phòng Vận tải",
+            "children": [
+              { "id": "VT_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng VT"] },
+              { "id": "VT_ADM", "topic": "Xử lý văn bản & Lệnh xe", "roles": ["NV Admin", "NV Điều phối"] },
+              { "id": "VT_DRIVE", "topic": "Đội ngũ Lái xe", "roles": ["Lái xe tải/Cont", "Lái xe điện"] }
+            ]
+          },
+          {
+            "id": "DEPT_AN",
+            "topic": "Phòng An ninh - An toàn",
+            "children": [
+              { "id": "AN_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng AN"] },
+              { "id": "AN_ADM", "topic": "Xử lý văn bản & Báo cáo", "roles": ["CV HSSE"] },
+              { "id": "AN_OPS", "topic": "An ninh & Y tế", "roles": ["Tổ An ninh", "NV Y tế"] }
+            ]
+          },
+          {
+            "id": "DEPT_TDMH",
+            "topic": "Phòng Thẩm định Mua hàng",
+            "children": [
+              { "id": "MH_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng TĐMH"] },
+              { "id": "MH_ADM", "topic": "Xử lý văn bản & Hồ sơ thầu", "roles": ["CV Thẩm định"] },
+              { "id": "MH_FUNC", "topic": "Nghiệp vụ Thẩm định", "roles": ["Phó phòng (Vận hành)", "Phó phòng (Dự án)"] }
+            ]
+          },
+          {
+            "id": "DEPT_KHDA",
+            "topic": "Phòng Kế hoạch - Dự án",
+            "children": [
+              { "id": "KHDA_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng KH-DA"] },
+              { "id": "KHDA_ADM", "topic": "Xử lý văn bản & Pháp lý", "roles": ["Phó phòng Pháp lý", "CV Kế hoạch"] },
+              { "id": "KHDA_TECH", "topic": "Kỹ thuật & Giám sát (Back-office)", "roles": ["Ban QLDA", "KS Xây dựng", "KS ME"] },
+              { "id": "KHDA_COST", "topic": "Kinh tế & Dự toán", "roles": ["QS", "Dự toán, Thanh toán"] }
+            ]
+          },
+          {
+            "id": "DEPT_DV",
+            "topic": "Tổ hợp Dịch vụ",
+            "children": [
+              { "id": "DV_GEN", "topic": "Quản lý chung", "roles": ["Quản lý Dịch vụ"] },
+              { "id": "DV_OPS", "topic": "Vận hành Dịch vụ", "roles": ["Bếp", "Nhà hàng", "Buồng phòng", "Lễ tân"] }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "BRANCH_PROJECTS",
+        "topic": "🏗️ KHỐI DỰ ÁN TRỌNG ĐIỂM",
+        "children": [
+          {
+            "id": "PROJ_VUTHANH",
+            "topic": "Dự án Vũ Thành",
+            "children": [
+              { "id": "VT_GEN", "topic": "Công việc chung (PM)", "roles": ["Giám đốc DA", "Phó GĐ DA"] },
+              { "id": "VT_ADM", "topic": "Xử lý văn bản DA", "roles": ["Thư ký DA", "Admin DA"] },
+              { "id": "VT_CONST", "topic": "Thi công & Giám sát", "roles": ["Kỹ sư trưởng", "KS Hiện trường", "ATLĐ"] },
+              { "id": "VT_QS", "topic": "Hồ sơ & Thanh toán", "roles": ["QS Dự án", "KS Hồ sơ"] }
+            ]
+          },
+          {
+            "id": "PROJ_SONCANG",
+            "topic": "Dự án Sơn Cảng",
+            "children": [
+              { "id": "SC_GEN", "topic": "Công việc chung (PM)", "roles": ["Giám đốc DA"] },
+              { "id": "SC_ADM", "topic": "Xử lý văn bản DA", "roles": ["Thư ký/Admin DA"] },
+              { "id": "SC_CONST", "topic": "Kỹ thuật & Vật tư", "roles": ["KS Xây dựng", "KS ME", "Thủ kho"] }
+            ]
+          },
+          {
+            "id": "PROJ_BAOCHAU",
+            "topic": "Dự án Bảo Châu",
+            "children": [
+              { "id": "BC_GEN", "topic": "Công việc chung (PM)", "roles": ["Giám đốc DA"] },
+              { "id": "BC_ADM", "topic": "Xử lý văn bản DA", "roles": ["Admin DA"] },
+              { "id": "BC_LEGAL", "topic": "Pháp lý & Hạ tầng", "roles": ["Chuyên viên Pháp lý", "KS Hạ tầng"] }
+            ]
+          },
+          {
+            "id": "PROJ_SONGTOAN",
+            "topic": "Dự án Song Toàn",
+            "children": [
+              { "id": "ST_GEN", "topic": "Công việc chung (PM)", "roles": ["Giám đốc DA"] },
+              { "id": "ST_ADM", "topic": "Xử lý văn bản DA", "roles": ["Admin DA"] },
+              { "id": "ST_TECH", "topic": "Thiết kế & Đấu thầu", "roles": ["QL Thiết kế", "Chuyên viên Đấu thầu"] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

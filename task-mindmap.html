@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Giao Việc - Tà Lùng Quang Minh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            position: relative;
+            z-index: 50;
+            flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Class để ẩn sidebar */
+        #sidebar.collapsed { margin-left: -350px; }
+
+        /* --- MAIN AREA --- */
+        #main-area {
+            flex: 1;
+            position: relative;
+            background-color: #f1f5f9;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Viewport (Native Scroll) */
+        #chart-viewport {
+            flex: 1;
+            overflow: auto;
+            cursor: grab;
+            display: block;
+            position: relative;
+            padding: 80px;
+        }
+        #chart-viewport:active { cursor: grabbing; }
+
+        /* Tree Container */
+        .tree-container {
+            transform-origin: top center;
+            transition: transform 0.1s ease-out;
+            width: max-content; 
+            margin: 0 auto;
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 100px;
+        }
+
+        /* --- TREE CSS --- */
+        .tree ul {
+            padding-top: 40px; 
+            position: relative;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center;
+        }
+
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 40px 15px 0 15px;
+            transition: all 0.5s;
+        }
+
+        /* Connectors */
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #94a3b8; width: 50%; height: 40px;
+        }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #94a3b8; width: 0; height: 40px;
+        }
+
+        /* --- CARD STYLES --- */
+        .org-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 10;
+            min-width: 180px;
+            max-width: 240px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: visible; /* Cho phép nút con hiển thị ra ngoài */
+            text-align: left;
+        }
+
+        .org-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            z-index: 20;
+            border-color: #3b82f6;
+        }
+
+        .org-card.highlight {
+            border: 3px solid #eab308 !important;
+            box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Card Header */
+        .card-header {
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 13px;
+            color: #1e293b;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+        }
+
+        /* Card Body */
+        .card-body {
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #475569;
+            background: white;
+            border-bottom-left-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+
+        .role-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        .role-item::before {
+            content: '•';
+            margin-right: 6px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        .role-item:last-child { margin-bottom: 0; }
+
+        /* --- COLOR THEMES BY LEVEL (Cấp độ) --- */
+        
+        /* Level 0: Root (Màu tối/Đen) */
+        .theme-level-0 .card-header { background: #1e293b; color: white; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
+        .theme-level-0 { border: 2px solid #0f172a; min-width: 250px; border-top: 4px solid #0f172a; }
+
+        /* Level 1: Các Phòng ban & Dự án (Xanh Dương) */
+        .theme-level-1 .card-header { background: #eff6ff; color: #1e40af; border-bottom-color: #bfdbfe; }
+        .theme-level-1 { border-top: 4px solid #2563eb; }
+
+        /* Level 2: Các Nhóm công việc con (Xanh Lá) */
+        .theme-level-2 .card-header { background: #ecfdf5; color: #047857; border-bottom-color: #a7f3d0; }
+        .theme-level-2 { border-top: 4px solid #059669; }
+
+        /* Level 3+: Các cấp nhỏ hơn nếu có (Cam) */
+        .theme-level-3 .card-header { background: #fffbeb; color: #b45309; border-bottom-color: #fde68a; }
+        .theme-level-3 { border-top: 4px solid #d97706; }
+
+        /* Collapse Button */
+        .collapse-btn {
+            width: 22px; height: 22px; background: #fff; border: 1px solid #94a3b8; border-radius: 50%;
+            position: absolute; 
+            bottom: -11px; /* Đẩy xuống dưới một nửa */
+            left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 50;
+            font-size: 14px; color: #64748b; line-height: 1; transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thêm bóng để nổi bật */
+        }
+        .collapse-btn:hover { background: #f1f5f9; color: #2563eb; border-color: #2563eb; transform: translateX(-50%) scale(1.1); }
+        .hidden-children ul { display: none !important; }
+        .hidden-children .collapse-btn::after { content: '+'; }
+        .visible-children .collapse-btn::after { content: '-'; }
+
+        /* Print styles */
+        @media print {
+            @page { size: landscape; margin: 0; }
+            body { height: auto; overflow: visible; background: white; }
+            #sidebar, #toolbar, #show-sidebar-btn { display: none !important; }
+            #main-area { background: white; overflow: visible; display: block; height: auto; }
+            #chart-viewport { padding: 0; overflow: visible; display: block; }
+            .tree-container { transform: scale(0.6) !important; transform-origin: top center; width: 100%; display: block; }
+            .org-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+            .collapse-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR: Mặc định có class 'collapsed' để ẩn -->
+    <div id="sidebar" class="collapsed">
+        <div class="p-4 bg-slate-900 text-white flex justify-between items-center shadow-md">
+            <h2 class="font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+                <i class="fas fa-network-wired text-blue-400"></i> Quản Lý Giao Việc
+            </h2>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="p-3 bg-white border-b grid grid-cols-2 gap-2 shadow-sm z-10">
+            <button onclick="triggerImport()" class="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2 rounded text-xs font-bold hover:bg-slate-50 transition">
+                <i class="fas fa-upload text-blue-500"></i> Nhập JSON
+            </button>
+            <button onclick="exportJsonData()" class="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 py-2 rounded text-xs font-bold hover:bg-slate-50 transition">
+                <i class="fas fa-download text-green-600"></i> Xuất JSON
+            </button>
+            <button onclick="printChart()" class="col-span-2 flex items-center justify-center gap-2 bg-slate-700 text-white py-2 rounded text-xs font-bold hover:bg-slate-800 transition">
+                <i class="fas fa-print"></i> In / Lưu PDF
+            </button>
+            <button onclick="updateChart()" class="col-span-2 flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded text-xs font-bold hover:bg-blue-700 transition shadow">
+                <i class="fas fa-sync-alt"></i> Cập Nhật Giao Diện
+            </button>
+            <input type="file" id="file-input" accept=".json" class="hidden" onchange="handleFileSelect(this)">
+        </div>
+
+        <div class="flex-1 flex flex-col p-2 bg-slate-50 overflow-hidden">
+            <div class="flex justify-between items-end mb-1 px-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase">Dữ liệu nguồn (JSON)</label>
+                <button onclick="copyJson()" class="text-[10px] text-blue-600 hover:underline">Copy</button>
+            </div>
+            <textarea id="json-input" class="flex-1 w-full p-3 text-[10px] font-mono border border-slate-300 rounded shadow-inner outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 resize-none text-slate-700 leading-tight" spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main-area">
+        <!-- Nút hiện sidebar: Mặc định hiển thị vì sidebar đang ẩn -->
+        <button id="show-sidebar-btn" onclick="toggleSidebar()" class="absolute top-4 left-4 z-40 bg-white w-9 h-9 rounded-full shadow-lg border flex items-center justify-center text-slate-600 hover:text-blue-600 transition hover:scale-105">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Floating Toolbar -->
+        <div id="toolbar" class="absolute top-4 left-0 right-0 px-4 flex justify-between pointer-events-none z-30">
+            <!-- Search Container: Margin-left nhỏ (60px) vì sidebar đang ẩn -->
+            <div class="pointer-events-auto bg-white/95 backdrop-blur shadow-lg border rounded-full pl-4 pr-2 py-1.5 flex items-center gap-2 w-80 transition-all duration-300 ml-auto md:ml-0" style="margin-left: 60px;" id="search-container">
+                <i class="fas fa-search text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" placeholder="Tìm tên phòng, chức danh, nhiệm vụ..." class="bg-transparent text-sm outline-none w-full text-slate-700 placeholder-slate-400" onkeyup="searchNode()">
+            </div>
+
+            <div class="pointer-events-auto flex items-center gap-1 bg-white/95 backdrop-blur p-1 rounded-lg shadow-lg border text-slate-600">
+                <button onclick="zoom(-0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-minus"></i></button>
+                <span id="zoom-level" class="text-xs font-bold font-mono w-12 text-center border-x border-slate-200">100%</span>
+                <button onclick="zoom(0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition"><i class="fas fa-plus"></i></button>
+                <button onclick="resetView()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition text-blue-600" title="Reset View"><i class="fas fa-compress-arrows-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Viewport -->
+        <div id="chart-viewport">
+            <div class="tree-container" id="tree-container">
+                <div class="tree">
+                    <ul id="tree-root"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA
+        const initialData = {
+        "root": {
+            "id": "ROOT_COMPANY",
+            "topic": "CÔNG TY CỔ PHẦN TÀ LÙNG QUANG MINH",
+            "children": [
+            {
+                "id": "BRANCH_MANAGERS",
+                "topic": "CÁN BỘ QUẢN LÝ",
+                "description": "Kênh giao việc trực tiếp cho các cấp Trưởng đơn vị",
+                "children": [
+                { "id": "MGR_00", "topic": "Ban Tổng Giám đốc", "roles": ["Tổng Giám Đốc", "Phó Tổng Giám Đốc"] },
+                { "id": "MGR_01", "topic": "Ban Giám sát Vận hành", "roles": ["Trưởng ban Giám sát Vận hành"] },
+                { "id": "MGR_02", "topic": "Phòng Hành chính Nhân sự", "roles": ["Trưởng phòng Hành chính Nhân sự", "Phó phòng Hành chính Nhân sự"] },
+                { "id": "MGR_03", "topic": "Phòng Tài chính Kế toán", "roles": ["Trưởng phòng Tài chính Kế toán", "Phó phòng Tài chính Kế toán"] },
+                { "id": "MGR_04", "topic": "Phòng Kinh doanh", "roles": ["Trưởng phòng Kinh doanh", "Phó phòng Kinh doanh"] },
+                { "id": "MGR_05", "topic": "Phòng Vận hành", "roles": ["Trưởng phòng Vận hành"] },
+                { "id": "MGR_06", "topic": "Phòng Vận tải", "roles": ["Trưởng phòng Vận tải"] },
+                { "id": "MGR_07", "topic": "Phòng An ninh - An toàn", "roles": ["Trưởng phòng An ninh - An toàn"] },
+                { "id": "MGR_08", "topic": "Phòng Kế hoạch - Dự án", "roles": ["Trưởng phòng Kế hoạch - Dự án"] },
+                { "id": "MGR_09", "topic": "Phòng Thẩm định Mua hàng", "roles": ["Trưởng phòng Thẩm định Mua hàng"] },
+                { "id": "MGR_10", "topic": "Tổ hợp Dịch vụ", "roles": ["Quản lý Tổ hợp Dịch vụ"] },
+                { "id": "MGR_PROJ_VT", "topic": "Dự án Vũ Thành", "roles": ["Quản lý Dự án Vũ Thành"] },
+                { "id": "MGR_PROJ_SC", "topic": "Dự án Sơn Cảng", "roles": ["Quản lý Dự án Sơn Cảng"] },
+                { "id": "MGR_PROJ_BC", "topic": "Dự án Bảo Châu", "roles": ["Quản lý Dự án Bảo Châu"] },
+                { "id": "MGR_PROJ_ST", "topic": "Dự án Song Toàn", "roles": ["Quản lý Dự án Song Toàn"] }
+                ]
+            },
+            {
+                "id": "DEPT_BGD",
+                "topic": "Ban Tổng Giám đốc",
+                "children": [
+                { "id": "BGD_GEN", "topic": "Công việc chung", "roles": ["Hội đồng quản trị", "Tổng Giám Đốc"] },
+                { "id": "BGD_ADM", "topic": "Xử lý văn bản & Thư ký", "roles": ["Thư ký HĐQT", "Trợ lý TGĐ"] }
+                ]
+            },
+            {
+                "id": "DEPT_GS",
+                "topic": "Ban Giám sát Vận hành",
+                "children": [
+                { "id": "GS_GEN", "topic": "Công việc chung", "roles": ["Trưởng ban Giám sát Vận hành"] },
+                { "id": "GS_ADM", "topic": "Xử lý văn bản", "roles": ["Chuyên viên Giám sát (Kiêm Admin)"] },
+                { "id": "GS_OPS", "topic": "Kiểm tra & Giám sát hiện trường", "roles": ["Chuyên viên Giám sát Vận hành"] }
+                ]
+            },
+            {
+                "id": "DEPT_HCNS",
+                "topic": "Phòng Hành chính - Nhân sự",
+                "children": [
+                { "id": "HCNS_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Hành chính Nhân sự"] },
+                { "id": "HCNS_ADM", "topic": "Xử lý văn bản", "roles": ["Nhân viên Văn thư"] },
+                { "id": "HCNS_ADMIN_OPS", "topic": "Hành chính & Quản trị văn phòng", "roles": ["Chuyên viên Hành chính Nhân sự"] },
+                { "id": "HCNS_RECRUIT", "topic": "Tuyển dụng & Đào tạo", "roles": ["Phó phòng Hành chính Nhân sự", "Chuyên viên Tuyển dụng"] },
+                { "id": "HCNS_LEGAL", "topic": "Pháp chế Doanh nghiệp", "roles": ["Chuyên viên Pháp chế"] },
+                { "id": "HCNS_IT", "topic": "Công nghệ thông tin (IT)", "roles": ["Tổ trưởng Tổ CNTT", "Nhân viên CNTT"] },
+                { "id": "HCNS_LOGISTIC", "topic": "Hậu cần & Tạp vụ", "roles": ["Tổ trưởng Tổ Tạp vụ", "Nhân viên Tạp vụ"] }
+                ]
+            },
+            {
+                "id": "DEPT_TCKT",
+                "topic": "Phòng Tài chính - Kế toán",
+                "children": [
+                { "id": "TCKT_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Tài chính Kế toán"] },
+                { "id": "TCKT_ADM", "topic": "Xử lý văn bản & Lưu trữ", "roles": ["Nhân viên Kế toán (Admin)"] },
+                { "id": "TCKT_TREASURY", "topic": "Ngân quỹ & Tiền mặt", "roles": ["Thủ quỹ"] },
+                { "id": "TCKT_TAX", "topic": "Kế toán Thuế", "roles": ["Nhân viên Kế toán Thuế"] },
+                { "id": "TCKT_REV", "topic": "Kế toán Doanh thu", "roles": ["Nhân viên Kế toán Doanh thu"] },
+                { "id": "TCKT_PAY", "topic": "Kế toán Thanh toán & Công nợ", "roles": ["Phó phòng Tài chính Kế toán", "Nhân viên Kế toán Thanh toán"] },
+                { "id": "TCKT_BRANCH", "topic": "Kế toán Chi nhánh (Cao Bằng)", "roles": ["Nhân viên Kế toán tại Cao Bằng"] }
+                ]
+            },
+            {
+                "id": "DEPT_KD",
+                "topic": "Phòng Kinh doanh",
+                "children": [
+                { "id": "KD_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Kinh doanh"] },
+                { "id": "KD_ADM", "topic": "Xử lý văn bản & Admin Sales", "roles": ["Nhân viên Admin Kinh doanh"] },
+                { "id": "KD_DOMESTIC", "topic": "Kinh doanh Nội địa", "roles": ["Phó phòng Kinh doanh", "Nhân viên Kinh doanh Nội địa"] },
+                { "id": "KD_INT", "topic": "Kinh doanh Quốc tế", "roles": ["Nhân viên Kinh doanh Quốc tế"] },
+                { "id": "KD_CS", "topic": "Chăm sóc khách hàng (CSKH)", "roles": ["Trưởng bộ phận CSKH", "Nhân viên CSKH"] },
+                { "id": "KD_IMPORT", "topic": "Xuất Nhập Khẩu", "roles": ["Trưởng bộ phận Xuất nhập khẩu", "Nhân viên Xuất nhập khẩu"] },
+                { "id": "KD_MKT", "topic": "Marketing & Thương hiệu", "roles": ["Trưởng bộ phận Marketing", "Chuyên viên Marketing"] }
+                ]
+            },
+            {
+                "id": "DEPT_VH",
+                "topic": "Phòng Vận hành",
+                "children": [
+                { "id": "VH_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Vận hành"] },
+                { "id": "VH_ADM", "topic": "Xử lý văn bản & Thống kê", "roles": ["Nhân viên Admin"] },
+                { "id": "VH_DISPATCH", "topic": "Điều độ Kho cảng", "roles": ["Tổ trưởng Tổ Điều độ", "Nhân viên Điều độ Kho cảng", "Nhân viên Đón xe"] },
+                { "id": "VH_MECH", "topic": "Vận hành Cơ giới", "roles": ["Tổ trưởng Tổ Cơ giới", "Nhân viên Cẩu giàn", "Nhân viên Lái xe nâng", "Nhân viên Lái máy gắp", "Nhân viên Phụ cầu"] },
+                { "id": "VH_LOAD", "topic": "Xếp dỡ Hàng hóa", "roles": ["Tổ trưởng Tổ Xếp dỡ", "Công nhân Xếp dỡ"] },
+                { "id": "VH_TECH", "topic": "Kỹ thuật & Bảo trì", "roles": ["Tổ trưởng Tổ Kỹ thuật", "Nhân viên Cơ khí", "Nhân viên Sửa chữa máy", "Nhân viên Điện nước"] }
+                ]
+            },
+            {
+                "id": "DEPT_VT",
+                "topic": "Phòng Vận tải",
+                "children": [
+                { "id": "VT_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Vận tải"] },
+                { "id": "VT_ADM", "topic": "Xử lý văn bản & Giấy tờ xe", "roles": ["Nhân viên Admin"] },
+                { "id": "VT_COORD", "topic": "Điều phối Vận tải", "roles": ["Nhân viên Điều phối xe"] },
+                { "id": "VT_DRIVE", "topic": "Vận hành Phương tiện", "roles": ["Nhân viên Lái xe tải", "Nhân viên Lái xe container", "Nhân viên Lái xe điện"] }
+                ]
+            },
+            {
+                "id": "DEPT_AN",
+                "topic": "Phòng An ninh - An toàn",
+                "children": [
+                { "id": "AN_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng An ninh - An toàn"] },
+                { "id": "AN_ADM", "topic": "Xử lý văn bản", "roles": ["Nhân viên Admin An ninh (Kiêm nhiệm)"] },
+                { "id": "AN_HSSE", "topic": "An toàn - Sức khỏe - Môi trường (HSSE)", "roles": ["Chuyên viên HSSE"] },
+                { "id": "AN_SEC", "topic": "An ninh & Bảo vệ", "roles": ["Tổ trưởng Tổ An ninh", "Nhân viên An ninh Chốt", "Nhân viên An ninh Tuần tra"] },
+                { "id": "AN_MED", "topic": "Y tế", "roles": ["Nhân viên Y tế"] }
+                ]
+            },
+            {
+                "id": "DEPT_TDMH",
+                "topic": "Phòng Thẩm định Mua hàng",
+                "children": [
+                { "id": "MH_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Thẩm định Mua hàng"] },
+                { "id": "MH_ADM", "topic": "Xử lý văn bản & Hồ sơ thầu", "roles": ["Chuyên viên Thẩm định (Kiêm nhiệm Admin)"] },
+                { "id": "MH_FUNC_OPS", "topic": "Thẩm định Mua hàng Vận hành", "roles": ["Phó phòng Thẩm định (Mảng Vận hành)", "Chuyên viên Thẩm định Vận hành, Dịch vụ"] },
+                { "id": "MH_FUNC_PROJ", "topic": "Thẩm định Mua hàng Dự án", "roles": ["Phó phòng Thẩm định (Mảng Dự án)", "Chuyên viên Thẩm định Dự án"] }
+                ]
+            },
+            {
+                "id": "DEPT_KHDA",
+                "topic": "Phòng Kế hoạch - Dự án",
+                "children": [
+                { "id": "KHDA_GEN", "topic": "Công việc chung", "roles": ["Trưởng phòng Kế hoạch - Dự án"] },
+                { "id": "KHDA_ADM", "topic": "Xử lý văn bản", "roles": ["Chuyên viên Kế hoạch (Kiêm Admin)"] },
+                { "id": "KHDA_LEGAL", "topic": "Pháp lý Dự án", "roles": ["Phó phòng Pháp lý Dự án"] },
+                { "id": "KHDA_PM", "topic": "Quản lý Dự án (Back-office)", "roles": ["Trưởng ban Quản lý dự án", "Quản lý Thiết kế", "Quản lý Tiến độ & Chất lượng"] },
+                { "id": "KHDA_ENG", "topic": "Kỹ thuật chuyên môn", "roles": ["Kỹ sư Xây dựng", "Kỹ sư Cơ điện (ME)"] },
+                { "id": "KHDA_COST", "topic": "Kinh tế Xây dựng & Dự toán", "roles": ["Kỹ sư QS", "Chuyên viên Dự toán", "Chuyên viên Thanh toán"] }
+                ]
+            },
+            {
+                "id": "DEPT_DV",
+                "topic": "Tổ hợp Dịch vụ",
+                "children": [
+                { "id": "DV_GEN", "topic": "Công việc chung", "roles": ["Quản lý Tổ hợp Dịch vụ"] },
+                { "id": "DV_ADM", "topic": "Xử lý văn bản", "roles": ["Nhân viên Lễ tân (Kiêm Admin)"] },
+                { "id": "DV_KITCHEN", "topic": "Bếp & Ẩm thực", "roles": ["Nhân viên Bếp"] },
+                { "id": "DV_REST", "topic": "Nhà hàng", "roles": ["Nhân viên Nhà hàng"] },
+                { "id": "DV_ROOM", "topic": "Buồng phòng & Lưu trú", "roles": ["Nhân viên Buồng phòng", "Nhân viên Lễ tân"] }
+                ]
+            },
+            {
+                "id": "PROJ_VUTHANH",
+                "topic": "Dự án Vũ Thành",
+                "children": [
+                { "id": "VT_GEN", "topic": "Công việc chung", "roles": ["Quản lý Dự án", "Phó Quản lý Dự án"] },
+                { "id": "VT_ADM", "topic": "Xử lý văn bản & Hồ sơ", "roles": ["Thư ký Dự án", "Admin Dự án"] },
+                { "id": "VT_CONST", "topic": "Thi công & Giám sát hiện trường", "roles": ["Kỹ sư trưởng", "Kỹ sư Hiện trường", "Giám sát An toàn lao động"] },
+                { "id": "VT_QS", "topic": "Thanh quyết toán (QS)", "roles": ["Kỹ sư QS Dự án", "Kỹ sư Hồ sơ"] }
+                ]
+            },
+            {
+                "id": "PROJ_SONCANG",
+                "topic": "Dự án Sơn Cảng",
+                "children": [
+                { "id": "SC_GEN", "topic": "Công việc chung", "roles": ["Quản lý Dự án"] },
+                { "id": "SC_ADM", "topic": "Xử lý văn bản & Hồ sơ", "roles": ["Thư ký Dự án", "Admin Dự án"] },
+                { "id": "SC_TECH", "topic": "Kỹ thuật & Giám sát", "roles": ["Kỹ sư Xây dựng", "Kỹ sư Cơ điện (ME)"] },
+                { "id": "SC_MAT", "topic": "Quản lý Vật tư", "roles": ["Thủ kho Dự án"] }
+                ]
+            },
+            {
+                "id": "PROJ_BAOCHAU",
+                "topic": "Dự án Bảo Châu",
+                "children": [
+                { "id": "BC_GEN", "topic": "Công việc chung", "roles": ["Quản lý Dự án"] },
+                { "id": "BC_ADM", "topic": "Xử lý văn bản & Hồ sơ", "roles": ["Admin Dự án"] },
+                { "id": "BC_LEGAL", "topic": "Pháp lý & Quy hoạch", "roles": ["Chuyên viên Pháp lý"] },
+                { "id": "BC_INFRA", "topic": "Kỹ thuật Hạ tầng", "roles": ["Kỹ sư Hạ tầng"] }
+                ]
+            },
+            {
+                "id": "PROJ_SONGTOAN",
+                "topic": "Dự án Song Toàn",
+                "children": [
+                { "id": "ST_GEN", "topic": "Công việc chung", "roles": ["Quản lý Dự án"] },
+                { "id": "ST_ADM", "topic": "Xử lý văn bản & Hồ sơ", "roles": ["Admin Dự án"] },
+                { "id": "ST_DESIGN", "topic": "Thiết kế", "roles": ["Quản lý Thiết kế"] },
+                { "id": "ST_BID", "topic": "Đấu thầu", "roles": ["Chuyên viên Đấu thầu"] }
+                ]
+            }
+            ]
+        }
+        };
+
+        // 2. RENDER LOGIC
+        const treeRoot = document.getElementById('tree-root');
+        const jsonInput = document.getElementById('json-input');
+
+        function createNode(node, level = 0) {
+            const hasChildren = node.children && node.children.length > 0;
+            const li = document.createElement('li');
+            li.className = hasChildren ? 'visible-children' : '';
+            
+            // XỬ LÝ MÀU THEO CẤP (Level-based Coloring)
+            // level 0: Root
+            // level 1: Các node con trực tiếp (Phòng, Dự án, Branch Managers) -> Xanh Dương
+            // level 2: Các nhóm con (Công việc chung, Văn bản...) -> Xanh Lá
+            // level 3 trở lên: Màu Cam (nếu có)
+            let themeClass = 'theme-level-' + Math.min(level, 3); // Tối đa level 3
+
+            // Card
+            const card = document.createElement('div');
+            card.className = `org-card ${themeClass}`;
+            
+            // Header
+            let html = `<div class="card-header">${node.topic}</div>`;
+            
+            // Body
+            if (node.roles && node.roles.length > 0) {
+                html += `<div class="card-body">`;
+                node.roles.forEach(role => {
+                    html += `<div class="role-item">${role}</div>`;
+                });
+                html += `</div>`;
+            } else if (node.description) {
+                 html += `<div class="card-body italic text-gray-400 text-[10px] text-center">${node.description}</div>`;
+            }
+
+            // Collapse Button
+            if (hasChildren) {
+                html += `<div class="collapse-btn" onclick="toggleNode(this, event)"></div>`;
+            }
+            
+            card.innerHTML = html;
+            li.appendChild(card);
+
+            // Children
+            if (hasChildren) {
+                const ul = document.createElement('ul');
+                node.children.forEach(child => {
+                    ul.appendChild(createNode(child, level + 1));
+                });
+                li.appendChild(ul);
+            }
+
+            return li;
+        }
+
+        window.toggleNode = function(btn, e) {
+            e.stopPropagation();
+            const li = btn.closest('li');
+            li.classList.toggle('hidden-children');
+            li.classList.toggle('visible-children');
+        };
+
+        function renderChart(data) {
+            treeRoot.innerHTML = '';
+            const rootNode = data.root || data; 
+            treeRoot.appendChild(createNode(rootNode));
+        }
+
+        // 3. EDITOR & IMPORT/EXPORT LOGIC
+        jsonInput.value = JSON.stringify(initialData, null, 2);
+        renderChart(initialData);
+
+        function updateChart() {
+            try { renderChart(JSON.parse(jsonInput.value)); } catch (e) { alert("JSON lỗi: " + e.message); }
+        }
+        function copyJson() { jsonInput.select(); document.execCommand('copy'); }
+        
+        // HÀM TRIGGER IMPORT
+        function triggerImport() { document.getElementById('file-input').click(); }
+        
+        /* HƯỚNG DẪN IMPORT FILE JSON:
+           1. Chuẩn bị file .json có cấu trúc giống biến 'initialData' ở trên.
+           2. Cấu trúc cơ bản:
+              {
+                "root": {
+                    "id": "ID_GOC",
+                    "topic": "Tên Công Ty",
+                    "children": [ ...mảng các node con... ]
+                }
+              }
+           3. Bấm nút "Nhập JSON" trên giao diện -> Chọn file từ máy tính.
+           4. Sơ đồ sẽ tự động vẽ lại theo dữ liệu mới.
+        */
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (!file) return; 
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const json = JSON.parse(content);
+                    jsonInput.value = JSON.stringify(json, null, 2);
+                    renderChart(json);
+                } catch (err) {
+                    alert("File không hợp lệ hoặc cấu trúc JSON bị sai.");
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // HÀM EXPORT JSON (Tải file về máy)
+        function exportJsonData() {
+            // Lấy dữ liệu từ khung editor
+            const dataStr = jsonInput.value;
+            // Tạo Blob object
+            const blob = new Blob([dataStr], { type: "application/json" });
+            // Tạo URL
+            const url = URL.createObjectURL(blob);
+            
+            // Tạo thẻ a ảo để kích hoạt tải xuống
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "SoDoGiaoViec_TaLung.json";
+            document.body.appendChild(link);
+            link.click();
+            
+            // Dọn dẹp
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // 4. SEARCH & ZOOM & PAN (Logic như cũ)
+        function searchNode() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.org-card');
+            cards.forEach(card => {
+                card.classList.remove('highlight');
+                if (term.length > 1 && card.innerText.toLowerCase().includes(term)) {
+                    card.classList.add('highlight');
+                    let parent = card.parentElement;
+                    while(parent) {
+                        if(parent.tagName === 'LI' && parent.classList.contains('hidden-children')) {
+                            parent.classList.remove('hidden-children');
+                            parent.classList.add('visible-children');
+                        }
+                        parent = parent.parentElement;
+                    }
+                    card.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
+                }
+            });
+        }
+
+        let scale = 0.8;
+        const viewport = document.getElementById('chart-viewport');
+        const container = document.getElementById('tree-container');
+        const zoomDisplay = document.getElementById('zoom-level');
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        function updateTransform() {
+            container.style.transform = `scale(${scale})`;
+            zoomDisplay.innerText = Math.round(scale * 100) + "%";
+        }
+        function zoom(delta) {
+            scale = Math.max(0.1, Math.min(3, scale + delta));
+            updateTransform();
+        }
+        function resetView() {
+            scale = 0.8; updateTransform();
+            if(viewport) viewport.scrollTo((viewport.scrollWidth - viewport.clientWidth) / 2, 0);
+        }
+
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.org-card') || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) return;
+            isDragging = true; viewport.style.cursor = 'grabbing';
+            startX = e.pageX - viewport.offsetLeft; startY = e.pageY - viewport.offsetTop;
+            scrollLeft = viewport.scrollLeft; scrollTop = viewport.scrollTop;
+        });
+        viewport.addEventListener('mouseleave', () => { isDragging = false; viewport.style.cursor = 'grab'; });
+        viewport.addEventListener('mouseup', () => { isDragging = false; viewport.style.cursor = 'grab'; });
+        viewport.addEventListener('mousemove', (e) => {
+            if (!isDragging) return; e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft; const y = e.pageY - viewport.offsetTop;
+            viewport.scrollLeft = scrollLeft - (x - startX); viewport.scrollTop = scrollTop - (y - startY);
+        });
+        viewport.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) { e.preventDefault(); zoom(-Math.sign(e.deltaY) * 0.1); }
+        }, { passive: false });
+
+        updateTransform();
+        setTimeout(resetView, 100);
+
+        // 6. UI TOGGLE
+        const sidebar = document.getElementById('sidebar');
+        const showBtn = document.getElementById('show-sidebar-btn');
+        const searchBox = document.getElementById('search-container');
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                showBtn.style.display = 'flex';
+                searchBox.style.marginLeft = "60px";
+            } else {
+                showBtn.style.display = 'none';
+                searchBox.style.marginLeft = "370px";
+            }
+        }
+        function printChart() { window.print(); }
+    </script>
+</body>
+</html>

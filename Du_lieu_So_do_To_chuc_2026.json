@@ -1,0 +1,248 @@
+{
+  "company_name": "CÔNG TY CỔ PHẦN TÀ LÙNG QUANG MINH",
+  "chart_name": "Sơ đồ Tổ chức Năm 2026",
+  "last_updated": "29/12/2025",
+  "structure": {
+    "name": "Đại Hội đồng Cổ đông",
+    "type": "root",
+    "children": [
+      {
+        "name": "Hội đồng Quản trị",
+        "type": "board",
+        "children": [
+          {
+            "name": "Ban Tổng Giám đốc",
+            "type": "executive",
+            "children": [
+              {
+                "name": "Ban Giám sát Vận hành",
+                "type": "department",
+                "manager": "Trưởng Ban Giám sát Vận hành",
+                "children": [
+                  { "name": "Chuyên viên Giám sát Vận hành", "type": "staff" }
+                ]
+              },
+              {
+                "name": "Phòng Kinh doanh",
+                "type": "department",
+                "manager": "Trưởng phòng Kinh doanh",
+                "children": [
+                  {
+                    "name": "Phó phòng Kinh doanh",
+                    "type": "sub_manager",
+                    "children": [
+                      {
+                        "name": "Bộ phận Kinh doanh Nội địa",
+                        "type": "team",
+                        "children": [{ "name": "Nhân viên Kinh doanh Nội địa", "type": "staff" }]
+                      },
+                      {
+                        "name": "Bộ phận Kinh doanh Quốc tế",
+                        "type": "team",
+                        "children": [{ "name": "Nhân viên Kinh doanh Quốc tế", "type": "staff" }]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Trưởng bộ phận Chăm sóc khách hàng",
+                    "type": "team_lead",
+                    "children": [{ "name": "Nhân viên Chăm sóc khách hàng", "type": "staff" }]
+                  },
+                  {
+                    "name": "Trưởng bộ phận Xuất nhập khẩu",
+                    "type": "team_lead",
+                    "children": [{ "name": "Nhân viên Xuất nhập khẩu", "type": "staff" }]
+                  },
+                  {
+                    "name": "Trưởng bộ phận Marketing",
+                    "type": "team_lead",
+                    "children": [{ "name": "Chuyên viên Marketing", "type": "staff" }]
+                  }
+                ]
+              },
+              {
+                "name": "Phòng Tài chính - Kế toán",
+                "type": "department",
+                "manager": "Trưởng phòng Tài chính - Kế toán",
+                "children": [
+                  {
+                    "name": "Phó phòng Tài chính - Kế toán",
+                    "type": "sub_manager",
+                    "children": [
+                      { "name": "Nhân viên Kế toán Thuế", "type": "staff" },
+                      { "name": "Nhân viên Kế toán Doanh thu", "type": "staff" },
+                      { "name": "Nhân viên Kế toán Thanh toán", "type": "staff" },
+                      { "name": "Nhân viên Kế toán tại Cao Bằng", "type": "staff" }
+                    ]
+                  },
+                  { "name": "Nhân viên Thủ quỹ", "type": "staff" }
+                ]
+              },
+              {
+                "name": "Phòng Hành chính - Nhân sự",
+                "type": "department",
+                "manager": "Trưởng phòng Hành chính - Nhân sự",
+                "children": [
+                  {
+                    "name": "Phó phòng Hành chính - Nhân sự",
+                    "type": "sub_manager",
+                    "children": [
+                      {
+                        "name": "Tổ trưởng Tổ Công nghệ thông tin",
+                        "type": "team_lead",
+                        "children": [{ "name": "Nhân viên Công nghệ thông tin", "type": "staff" }]
+                      },
+                      { "name": "Chuyên viên Hành chính - Nhân sự", "type": "staff" },
+                      { "name": "Chuyên viên Pháp chế", "type": "staff" },
+                      {
+                        "name": "Tổ trưởng Tổ Tạp vụ",
+                        "type": "team_lead",
+                        "children": [{ "name": "Nhân viên Tạp vụ", "type": "staff" }]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Phòng Thẩm định mua hàng",
+                "type": "department",
+                "manager": "Trưởng phòng Thẩm định mua hàng",
+                "children": [
+                  {
+                    "name": "Phó phòng Thẩm định mua hàng (Vận hành, Dịch vụ)",
+                    "type": "sub_manager",
+                    "children": [{ "name": "Chuyên viên Thẩm định mua hàng vận hành, dịch vụ", "type": "staff" }]
+                  },
+                  {
+                    "name": "Phó phòng Thẩm định mua hàng (Dự án)",
+                    "type": "sub_manager",
+                    "children": [{ "name": "Chuyên viên Thẩm định mua hàng dự án", "type": "staff" }]
+                  }
+                ]
+              },
+              {
+                "name": "Phòng Vận hành",
+                "type": "department",
+                "manager": "Trưởng phòng Vận hành",
+                "children": [
+                  {
+                    "name": "Tổ trưởng Tổ Cơ giới",
+                    "type": "team_lead",
+                    "children": [
+                      {
+                        "name": "Nhân viên Vận hành Cẩu giàn",
+                        "type": "staff_lead",
+                        "children": [{ "name": "Nhân viên Phụ cầu", "type": "staff" }]
+                      },
+                      {
+                        "name": "Nhân viên Vận hành Cầu tổng hợp",
+                        "type": "staff_lead",
+                        "children": [{ "name": "Nhân viên Phụ cầu", "type": "staff" }]
+                      },
+                      { "name": "Nhân viên Lái xe nâng", "type": "staff" },
+                      { "name": "Nhân viên Lái máy gắp", "type": "staff" }
+                    ]
+                  },
+                  {
+                    "name": "Tổ trưởng Điều độ kho cảng",
+                    "type": "team_lead",
+                    "children": [
+                      { "name": "Nhân viên Đón xe", "type": "staff" },
+                      { "name": "Nhân viên Điều độ kho cảng", "type": "staff" }
+                    ]
+                  },
+                  {
+                    "name": "Tổ trưởng Tổ Xếp dỡ hàng hóa",
+                    "type": "team_lead",
+                    "children": [{ "name": "Công nhân Xếp dỡ", "type": "staff" }]
+                  },
+                  {
+                    "name": "Tổ trưởng Tổ Kỹ thuật",
+                    "type": "team_lead",
+                    "children": [
+                      { "name": "Nhân viên Cơ khí", "type": "staff" },
+                      { "name": "Nhân viên Sửa chữa máy", "type": "staff" },
+                      { "name": "Nhân viên Kỹ thuật điện, nước", "type": "staff" }
+                    ]
+                  },
+                  { "name": "Nhân viên Admin", "type": "staff" }
+                ]
+              },
+              {
+                "name": "Phòng Vận tải",
+                "type": "department",
+                "manager": "Trưởng phòng Vận tải",
+                "children": [
+                  { "name": "Nhân viên Điều phối xe", "type": "staff" },
+                  { "name": "Nhân viên Lái xe tải", "type": "staff" },
+                  { "name": "Nhân viên Lái xe điện", "type": "staff" },
+                  { "name": "Nhân viên Admin", "type": "staff" }
+                ]
+              },
+              {
+                "name": "Phòng An ninh - An toàn",
+                "type": "department",
+                "manager": "Trưởng phòng An ninh - An toàn",
+                "children": [
+                  {
+                    "name": "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)",
+                    "type": "specialist",
+                    "children": [{ "name": "Nhân viên Y tế", "type": "staff" }]
+                  },
+                  {
+                    "name": "Tổ trưởng Tổ An ninh",
+                    "type": "team_lead",
+                    "children": [
+                      { "name": "Nhân viên An ninh trực chốt cố định", "type": "staff" },
+                      { "name": "Nhân viên An ninh tuần tra", "type": "staff" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Phòng Kế hoạch - Dự án",
+                "type": "department",
+                "manager": "Trưởng phòng Kế hoạch - Dự án",
+                "children": [
+                  {
+                    "name": "Phó phòng Pháp lý dự án",
+                    "type": "sub_manager",
+                    "children": [{ "name": "Chuyên viên Kế hoạch", "type": "staff" }]
+                  },
+                  {
+                    "name": "Trưởng Ban Quản lý dự án",
+                    "type": "sub_manager",
+                    "children": [
+                      { "name": "Kỹ sư Xây dựng", "type": "staff" },
+                      { "name": "Kỹ sư Cơ điện", "type": "staff" },
+                      { "name": "Quản lý khối lượng (QS)", "type": "staff" },
+                      { "name": "An toàn lao động", "type": "staff" }
+                    ]
+                  },
+                  { "name": "Nhân viên Dự toán và Thanh toán", "type": "staff" },
+                  { "name": "Quản lý Thiết kế", "type": "staff" },
+                  {
+                    "name": "Quản lý Tiến độ và Chất lượng",
+                    "type": "sub_manager",
+                    "children": [{ "name": "Kỹ sư Cơ điện, Xây dựng", "type": "staff" }]
+                  }
+                ]
+              },
+              {
+                "name": "Tổ hợp Dịch vụ",
+                "type": "service_unit",
+                "manager": "Quản lý dịch vụ",
+                "children": [
+                  { "name": "Bộ phận Bếp", "type": "team" },
+                  { "name": "Bộ phận Nhà hàng", "type": "team" },
+                  { "name": "Bộ phận Buồng phòng", "type": "team" },
+                  { "name": "Bộ phận Lễ tân", "type": "team" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

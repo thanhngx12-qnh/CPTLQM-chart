@@ -1,0 +1,129 @@
+{
+  "system": "AMIS Công việc",
+  "company": "Công ty Cổ phần Tà Lùng Quang Minh",
+  "version": "2026.2.0 (Final)",
+  "structure_type": "Hybrid (Functional & Project-based)",
+  "departments": [
+    {
+      "department_name": "BAN QUẢN LÝ CÁC DỰ ÁN TRỌNG ĐIỂM",
+      "type": "project_group",
+      "description": "Nhóm quản lý các dự án đầu tư xây dựng cơ bản và trọng điểm cấp công ty",
+      "projects": [
+        { "name": "Dự án Vũ Thành", "type": "key_project", "code": "DA-VUTHANH" },
+        { "name": "Dự án Sơn Cảng", "type": "key_project", "code": "DA-SONCANG" },
+        { "name": "Dự án Bảo Châu", "type": "key_project", "code": "DA-BAOCHAU" },
+        { "name": "Dự án Song Toàn", "type": "key_project", "code": "DA-SONGTOAN" }
+      ]
+    },
+    {
+      "department_name": "Phòng Kế hoạch - Dự án",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "KHDA-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "KHDA-DOC" },
+        { "name": "Pháp lý & Kế hoạch", "type": "functional", "code": "KHDA-PHAPLY" },
+        { "name": "Quản lý Thi công (QLDA)", "type": "functional", "code": "KHDA-THICONG" },
+        { "name": "Kỹ thuật & Kiểm soát (QS/TK)", "type": "functional", "code": "KHDA-KSTK" }
+      ]
+    },
+    {
+      "department_name": "Phòng Vận hành",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "VH-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "VH-DOC" },
+        { "name": "Tổ Cơ giới", "type": "functional", "code": "VH-COGIOI" },
+        { "name": "Tổ Điều độ kho cảng", "type": "functional", "code": "VH-DIEUDO" },
+        { "name": "Tổ Xếp dỡ hàng hóa", "type": "functional", "code": "VH-XEPDO" },
+        { "name": "Tổ Kỹ thuật - Bảo trì", "type": "functional", "code": "VH-KYTHUAT" },
+        { "name": "Hành chính Vận hành", "type": "functional", "code": "VH-ADMIN" }
+      ]
+    },
+    {
+      "department_name": "Phòng Kinh doanh",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "KD-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "KD-DOC" },
+        { "name": "Kinh doanh Nội địa", "type": "functional", "code": "KD-NOIDIA" },
+        { "name": "Kinh doanh Quốc tế", "type": "functional", "code": "KD-QUOCTE" },
+        { "name": "Chăm sóc Khách hàng", "type": "functional", "code": "KD-CSKH" },
+        { "name": "Xuất nhập khẩu", "type": "functional", "code": "KD-XNK" },
+        { "name": "Marketing & Truyền thông", "type": "functional", "code": "KD-MKT" }
+      ]
+    },
+    {
+      "department_name": "Phòng Vận tải",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "VT-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "VT-DOC" },
+        { "name": "Đội xe & Vận hành", "type": "functional", "code": "VT-DOIXE" },
+        { "name": "Điều phối & Hành chính", "type": "functional", "code": "VT-ADMIN" }
+      ]
+    },
+    {
+      "department_name": "Tổ hợp Dịch vụ",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "DV-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "DV-DOC" },
+        { "name": "Bộ phận Bếp", "type": "functional", "code": "DV-BEP" },
+        { "name": "Bộ phận Nhà hàng", "type": "functional", "code": "DV-NHAHANG" },
+        { "name": "Bộ phận Buồng phòng", "type": "functional", "code": "DV-HK" },
+        { "name": "Bộ phận Lễ tân", "type": "functional", "code": "DV-FO" }
+      ]
+    },
+    {
+      "department_name": "Phòng HC - NS",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "HCNS-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "HCNS-DOC" },
+        { "name": "Nhân sự & Pháp chế", "type": "functional", "code": "HCNS-HR" },
+        { "name": "Tổ Công nghệ thông tin", "type": "functional", "code": "HCNS-IT" },
+        { "name": "Tổ Tạp vụ & Hành chính", "type": "functional", "code": "HCNS-TAPVU" }
+      ]
+    },
+    {
+      "department_name": "Phòng Tài chính - Kế toán",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "TCKT-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "TCKT-DOC" },
+        { "name": "Nghiệp vụ Kế toán", "type": "functional", "code": "TCKT-KT" },
+        { "name": "Quản lý Doanh thu & Quỹ", "type": "functional", "code": "TCKT-Q" },
+        { "name": "Kế toán Chi nhánh Cao Bằng", "type": "functional", "code": "TCKT-CB" }
+      ]
+    },
+    {
+      "department_name": "Phòng An ninh - An toàn",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "ANAT-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "ANAT-DOC" },
+        { "name": "Tổ An ninh (Chốt & Tuần tra)", "type": "functional", "code": "ANAT-SEC" },
+        { "name": "An toàn HSSE & Y tế", "type": "functional", "code": "ANAT-HSSE" }
+      ]
+    },
+    {
+      "department_name": "Phòng Thẩm định mua hàng",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "TDMH-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "TDMH-DOC" },
+        { "name": "Thẩm định MH Vận hành & Dịch vụ", "type": "functional", "code": "TDMH-VH" },
+        { "name": "Thẩm định MH Dự án", "type": "functional", "code": "TDMH-DA" }
+      ]
+    },
+    {
+      "department_name": "Ban Giám sát Vận hành",
+      "type": "functional_dept",
+      "projects": [
+        { "name": "Công việc chung", "type": "default", "code": "GSVH-GEN" },
+        { "name": "Xử lý văn bản", "type": "default", "code": "GSVH-DOC" },
+        { "name": "Hoạt động Giám sát Vận hành", "type": "functional", "code": "GSVH-MAIN" }
+      ]
+    }
+  ]
+}
