@@ -430,6 +430,10 @@
                                     type: "dept",
                                     manager: "Trưởng phòng Vận hành",
                                     children: [
+                                        {
+                                            name: "Phó phòng Vận hành",
+                                            type: "sub",
+                                            children: [
                                         { 
                                             name: "Tổ trưởng Tổ Cơ giới", 
                                             type: "team",
@@ -471,6 +475,8 @@
                                             ]
                                         },
                                         { name: "Nhân viên Admin", type: "staff" }
+                                    ]
+                                        }
                                     ]
                                 },
                                 {
@@ -783,8 +789,8 @@
 
             switch(node.type) {
                 case 'root': icon = '<i class="fas fa-landmark text-lg"></i>'; break;
-                case 'board': icon = '<i class="fas fa-crown text-amber-600 text-lg"></i>'; badge = 'HĐQT'; badgeClass='badge-gold'; break;
-                case 'executive': icon = '<i class="fas fa-user-tie text-red-600 text-lg"></i>'; badge = 'Ban TGĐ'; badgeClass='badge-red'; break;
+                case 'board': icon = '<i class="fas fa-crown text-amber-600 text-lg"></i>'; badge = 'Chủ tịch HĐQT'; badgeClass='badge-gold'; break;
+                case 'executive': icon = '<i class="fas fa-user-tie text-red-600 text-lg"></i>'; badge = 'Tổng Giám đốc'; badgeClass='badge-red'; break;
                 case 'dept': icon = '<i class="fas fa-building text-blue-600"></i>'; break;
                 case 'sub': 
                 case 'manager': icon = '<i class="fas fa-user-shield text-sky-600"></i>'; break;

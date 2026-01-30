@@ -169,13 +169,21 @@
             border-color: #3b82f6;
         }
 
-        /* Color Schemes (Shared) */
-        .type-root { background: #1e293b; color: white !important; border-top: 4px solid #0f172a; }
-        .type-project_group { background: #fff7ed; border-top: 4px solid #f97316; }
-        .type-key_project { background: #fffbeb; border-top: 3px solid #f59e0b; }
-        .type-dept { background: #eff6ff; border-top: 3px solid #2563eb; }
-        .type-functional { background: #ffffff; border-top: 2px solid #64748b; }
-        .type-default { background: #f8fafc; border-top: 2px dashed #94a3b8; }
+        /* --- STYLES FOR TYPES --- */
+        .type-root { background: #0f172a; color: white !important; border-top: 4px solid #f59e0b; }
+        .type-root .card-title { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .type-key_project { background: #fffbeb; border-top: 4px solid #d97706; } /* Dự án to */
+        .type-key_project .card-title { color: #92400e; font-weight: 800; }
+
+        .type-project_group { background: #fef2f2; border-top: 4px solid #dc2626; } /* Cán bộ quản lý */
+        .type-project_group .card-title { color: #991b1b; font-weight: 800; }
+
+        .type-dept { background: #eff6ff; border-top: 3px solid #2563eb; } /* Phòng ban */
+        .type-dept .card-title { color: #1e40af; font-weight: 700; }
+
+        .type-functional { background: #ffffff; border-top: 2px solid #94a3b8; } /* Dự án con */
+        .type-default { background: #f8fafc; border-top: 2px dashed #cbd5e1; } /* Mặc định */
         
         .mm-card.highlight, .node-item.highlight {
             border: 2px solid #eab308 !important;
@@ -284,20 +292,50 @@
           "type": "root", 
           "children": [
             {
-                "name": "KHỐI DỰ ÁN TRỌNG ĐIỂM",
+                "name": "Dự án Vũ Thành", "type": "key_project",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                ]
+            },
+            {
+                "name": "Dự án Sơn Cảng", "type": "key_project",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                ]
+            },
+            {
+                "name": "Dự án Bảo Châu", "type": "key_project",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                ]
+            },
+            {
+                "name": "Dự án Song Toàn", "type": "key_project",
+                "children": [
+                    { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
+                ]
+            },
+            {
+                "name": "Cán bộ quản lý",
                 "type": "project_group",
                 "children": [
-                    { "name": "Dự án Vũ Thành", "type": "key_project" },
-                    { "name": "Dự án Sơn Cảng", "type": "key_project" },
-                    { "name": "Dự án Bảo Châu", "type": "key_project" },
-                    { "name": "Dự án Song Toàn", "type": "key_project" }
+                    { "name": "Kế hoạch - Dự án", "type": "functional" },
+                    { "name": "Vận Hành", "type": "functional" },
+                    { "name": "Kinh doanh", "type": "functional" },
+                    { "name": "Vận tải", "type": "functional" },
+                    { "name": "Tổ hợp dịch vụ", "type": "functional" },
+                    { "name": "Hành chính - Nhân sự", "type": "functional" },
+                    { "name": "Tài chính - Kế toán", "type": "functional" },
+                    { "name": "An ninh - An toàn", "type": "functional" },
+                    { "name": "Thẩm định Mua Hàng", "type": "functional" },
+                    { "name": "Giám sát Vận hành", "type": "functional" }
                 ]
             },
             {
                 "name": "Phòng Kế hoạch - Dự án", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Pháp lý & Kế hoạch", "type": "functional" }, { "name": "Quản lý Thi công (QLDA)", "type": "functional" }, { "name": "Kỹ thuật & Kiểm soát (QS/TK)", "type": "functional" }
+                    { "name": "Pháp lý và Kế hoạch", "type": "functional" }, { "name": "Quản lý Thi công", "type": "functional" }, { "name": "Kỹ thuật và Kiểm soát (Khối lượng/Thiết kế)", "type": "functional" }
                 ]
             },
             {
@@ -311,14 +349,14 @@
                 "name": "Phòng Kinh doanh", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "KD Nội địa", "type": "functional" }, { "name": "KD Quốc tế", "type": "functional" }, { "name": "CSKH", "type": "functional" }, { "name": "Xuất nhập khẩu", "type": "functional" }, { "name": "Marketing", "type": "functional" }
+                    { "name": "Kinh doanh Nội địa", "type": "functional" }, { "name": "Kinh doanh Quốc tế", "type": "functional" }, { "name": "Chăm sóc Khách hàng", "type": "functional" }, { "name": "Xuất nhập khẩu", "type": "functional" }, { "name": "Marketing", "type": "functional" }
                 ]
             },
             {
                 "name": "Phòng Vận tải", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Đội xe & Vận hành", "type": "functional" }, { "name": "Điều phối & Hành chính", "type": "functional" }
+                    { "name": "Đội xe và Vận hành", "type": "functional" }, { "name": "Điều phối và Hành chính", "type": "functional" }
                 ]
             },
             {
@@ -329,35 +367,35 @@
                 ]
             },
             {
-                "name": "Phòng HC - NS", "type": "dept",
+                "name": "Phòng Hành chính - Nhân sự", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Nhân sự & Pháp chế", "type": "functional" }, { "name": "Tổ CNTT", "type": "functional" }, { "name": "Tổ Tạp vụ", "type": "functional" }
+                    { "name": "Nhân sự và Pháp chế", "type": "functional" }, { "name": "Tổ Công nghệ thông tin", "type": "functional" }, { "name": "Tổ Tạp vụ", "type": "functional" }
                 ]
             },
             {
-                "name": "Phòng TC - KT", "type": "dept",
+                "name": "Phòng Tài chính - Kế toán", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Nghiệp vụ Kế toán", "type": "functional" }, { "name": "QL Doanh thu & Quỹ", "type": "functional" }, { "name": "KT CN Cao Bằng", "type": "functional" }
+                    { "name": "Nghiệp vụ Kế toán", "type": "functional" }, { "name": "Quản lý Doanh thu và Quỹ", "type": "functional" }, { "name": "Kế toán Chi nhánh Cao Bằng", "type": "functional" }
                 ]
             },
             {
-                "name": "Phòng An ninh", "type": "dept",
+                "name": "Phòng An ninh - An toàn", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Tổ An ninh", "type": "functional" }, { "name": "An toàn HSSE & Y tế", "type": "functional" }
+                    { "name": "Tổ An ninh", "type": "functional" }, { "name": "An toàn, Sức khỏe và Môi trường", "type": "functional" }
                 ]
             },
             {
-                "name": "Phòng Thẩm định MH", "type": "dept",
+                "name": "Phòng Thẩm định Mua hàng", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
-                    { "name": "Thẩm định MH Vận hành", "type": "functional" }, { "name": "Thẩm định MH Dự án", "type": "functional" }
+                    { "name": "Thẩm định Mua hàng Vận hành", "type": "functional" }, { "name": "Thẩm định Mua hàng Dự án", "type": "functional" }
                 ]
             },
             {
-                "name": "Ban Giám sát VH", "type": "dept",
+                "name": "Ban Giám sát Vận hành", "type": "dept",
                 "children": [
                     { "name": "Công việc chung", "type": "default" }, { "name": "Xử lý văn bản", "type": "default" },
                     { "name": "Hoạt động Giám sát", "type": "functional" }
