@@ -474,7 +474,20 @@
                                                 { name: "Nhân viên Kỹ thuật điện, nước", type: "staff" }
                                             ]
                                         },
-                                        { name: "Nhân viên Admin", type: "staff" }
+                                        { name: "Nhân viên Admin", type: "staff" },
+                                        { 
+                                            name: "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)", 
+                                            type: "sub",
+                                            children: [{ name: "Nhân viên Y tế", type: "staff" }]
+                                        },
+                                        { 
+                                            name: "Tổ trưởng Tổ An ninh", 
+                                            type: "team",
+                                            children: [
+                                                { name: "Nhân viên An ninh trực chốt cố định", type: "staff" },
+                                                { name: "Nhân viên An ninh tuần tra", type: "staff" }
+                                            ]
+                                        }
                                     ]
                                         }
                                     ]
@@ -490,26 +503,26 @@
                                         { name: "Nhân viên Admin", type: "staff" }
                                     ]
                                 },
-                                {
-                                    name: "Phòng An ninh - An toàn",
-                                    type: "dept",
-                                    manager: "Trưởng phòng An ninh - An toàn",
-                                    children: [
-                                        { 
-                                            name: "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)", 
-                                            type: "sub",
-                                            children: [{ name: "Nhân viên Y tế", type: "staff" }]
-                                        },
-                                        { 
-                                            name: "Tổ trưởng Tổ An ninh", 
-                                            type: "team",
-                                            children: [
-                                                { name: "Nhân viên An ninh trực chốt cố định", type: "staff" },
-                                                { name: "Nhân viên An ninh tuần tra", type: "staff" }
-                                            ]
-                                        }
-                                    ]
-                                },
+                                // {
+                                //     name: "Phòng An ninh - An toàn",
+                                //     type: "dept",
+                                //     manager: "Trưởng phòng An ninh - An toàn",
+                                //     children: [
+                                //         { 
+                                //             name: "Chuyên viên An toàn, Sức khỏe và Môi trường (HSSE)", 
+                                //             type: "sub",
+                                //             children: [{ name: "Nhân viên Y tế", type: "staff" }]
+                                //         },
+                                //         { 
+                                //             name: "Tổ trưởng Tổ An ninh", 
+                                //             type: "team",
+                                //             children: [
+                                //                 { name: "Nhân viên An ninh trực chốt cố định", type: "staff" },
+                                //                 { name: "Nhân viên An ninh tuần tra", type: "staff" }
+                                //             ]
+                                //         }
+                                //     ]
+                                // },
                                 {
                                     name: "Phòng Kế hoạch - Dự án",
                                     type: "dept",
